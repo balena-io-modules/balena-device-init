@@ -1,0 +1,48 @@
+{
+  "name": "resin-device-init",
+  "version": "1.0.0",
+  "description": "Configure and initialize devices using device specs",
+  "main": "build/init.js",
+  "homepage": "https://github.com/resin-io/resin-device-init",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/resin-io/resin-device-init.git"
+  },
+  "keywords": [
+    "resin",
+    "device",
+    "spec",
+    "initialize",
+    "configure"
+  ],
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "gulp test && coffee tests/e2e.coffee",
+    "prepublish": "gulp build",
+    "readme": "jsdoc2md --template doc/README.hbs build/init.js > README.md"
+  },
+  "author": "Juan Cruz Viotti <juanchiviotti@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "coffee-script": "^1.9.3",
+    "gulp": "^3.9.0",
+    "gulp-coffee": "^2.3.1",
+    "gulp-coffeelint": "^0.5.0",
+    "gulp-mocha": "^2.1.2",
+    "gulp-util": "~3.0.1",
+    "jsdoc-to-markdown": "^1.1.1",
+    "mocha": "^2.2.5",
+    "mochainon": "^1.0.0",
+    "wary": "^1.1.0"
+  },
+  "dependencies": {
+    "bluebird": "^2.9.34",
+    "resin-device-config": "^2.0.0",
+    "resin-device-operations": "^1.2.3",
+    "resin-image-fs": "^2.1.0",
+    "resin-sdk": "^2.4.1",
+    "string-to-stream": "^1.0.1"
+  }
+}
