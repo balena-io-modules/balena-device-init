@@ -15,7 +15,8 @@ RANDOM = path.join(__dirname, 'images', 'device.random')
 UUIDS = {}
 
 prepareDevice = (deviceType) ->
-	applicationName = "DeviceInitE2E_#{deviceType.replace('-', '_')}"
+	applicationName = "DeviceInitE2E_#{deviceType.replace(/[- ]/, '_')}"
+	console.log("Creating #{applicationName}")
 	resin.models.application.has(applicationName).then (hasApplication) ->
 		return if hasApplication
 		resin.models.application.create(applicationName, deviceType)
@@ -276,8 +277,8 @@ wary.it 'should be able to initialize an intel edison with a script',
 			m.chai.expect(stderr).to.equal('')
 
 Promise.props
-	raspberrypi: prepareDevice('raspberry-pi')
-	edison: prepareDevice('intel-edison')
+	raspberrypi: prepareDevice('Raspberry Pi')
+	edison: prepareDevice('Intel Edison')
 .then (uuids) ->
 	UUIDS = uuids
 	wary.run().catch (error) ->
