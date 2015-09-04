@@ -39,6 +39,7 @@
   },
   "dependencies": {
     "bluebird": "^2.9.34",
+    "lodash": "^3.10.1",
     "resin-device-config": "^2.0.0",
     "resin-device-operations": "^1.2.3",
     "resin-image-fs": "^2.1.0",

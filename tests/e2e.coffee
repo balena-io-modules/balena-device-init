@@ -273,12 +273,16 @@ wary.it 'should be able to initialize an intel edison with a script',
 
 			return waitStream(initialization)
 		.then ->
-			m.chai.expect(stdout.replace(/[\n\r]/, '')).to.equal('Hello World')
+			m.chai.expect(stdout.replace(/[\n\r]/g, '')).to.equal('Hello World')
 			m.chai.expect(stderr).to.equal('')
 
-Promise.props
-	raspberrypi: prepareDevice('Raspberry Pi')
-	edison: prepareDevice('Intel Edison')
+resin.auth.login
+	username: process.env.RESIN_E2E_USERNAME
+	password: process.env.RESIN_E2E_PASSWORD
+.then ->
+	Promise.props
+		raspberrypi: prepareDevice('Raspberry Pi')
+		edison: prepareDevice('Intel Edison')
 .then (uuids) ->
 	UUIDS = uuids
 	wary.run().catch (error) ->
