@@ -75,6 +75,7 @@ exports.configure = function(image, uuid, options) {
   }).then(function(results) {
     var configuration;
     configuration = results.manifest.configuration;
+    results.config.appUpdatePollInterval = (options.appUpdatePollInterval || 1) * 60000;
     return utils.writeConfigJSON(image, results.config, configuration.config).then(function() {
       return operations.execute(image, configuration.operations, options);
     });
