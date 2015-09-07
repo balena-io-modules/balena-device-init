@@ -69,7 +69,8 @@ exports.configure = (image, uuid, options) ->
 		configuration = results.manifest.configuration
 
 		# Convert from seconds to milliseconds
-		results.config.appUpdatePollInterval = (options.appUpdatePollInterval or 1) * 60000
+		if options.appUpdatePollInterval?
+			results.config.appUpdatePollInterval = String(options.appUpdatePollInterval * 60000)
 
 		utils.writeConfigJSON(image, results.config, configuration.config).then ->
 			return operations.execute(image, configuration.operations, options)

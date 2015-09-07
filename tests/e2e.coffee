@@ -212,7 +212,7 @@ wary.it 'should accept an appUpdatePollInterval setting',
 		.then(extract)
 		.then(JSON.parse)
 		.then (config) ->
-			m.chai.expect(config.appUpdatePollInterval).to.equal(120000)
+			m.chai.expect(config.appUpdatePollInterval).to.equal('120000')
 
 wary.it 'should default appUpdatePollInterval to 1 second',
 	raspberrypi: RASPBERRYPI
@@ -233,7 +233,7 @@ wary.it 'should default appUpdatePollInterval to 1 second',
 		.then(extract)
 		.then(JSON.parse)
 		.then (config) ->
-			m.chai.expect(config.appUpdatePollInterval).to.equal(60000)
+			m.chai.expect(config.appUpdatePollInterval).to.equal('60000')
 
 ########################################################################
 # Intel Edison
