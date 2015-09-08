@@ -41,7 +41,7 @@
     "bluebird": "^2.9.34",
     "lodash": "^3.10.1",
     "resin-device-config": "^2.1.0",
-    "resin-device-operations": "^1.2.4",
+    "resin-device-operations": "^1.2.5",
     "resin-image-fs": "^2.1.0",
     "resin-sdk": "^2.7.3",
     "string-to-stream": "^1.0.1"
