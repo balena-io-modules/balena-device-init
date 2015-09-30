@@ -26,9 +26,11 @@ THE SOFTWARE.
 /**
  * @module init
  */
-var Promise, deviceConfig, operations, utils;
+var Promise, deviceConfig, operations, resin, utils;
 
 Promise = require('bluebird');
+
+resin = require('resin-sdk');
 
 deviceConfig = require('resin-device-config');
 
@@ -91,13 +93,13 @@ exports.configure = function(image, uuid, options) {
  * @public
  *
  * @param {String} image - path to image
- * @param {String} uuid - device uuid
+ * @param {String} deviceType - device type slug
  * @param {Object} options - configuration options
  *
  * @returns {Promise<EventEmitter>} initialization event emitter
  *
  * @example
- * init.initialize('my/rpi.img', '7cf02a62a3a84440b1bb5579a3d57469148943278630b17e7fc6c4f7b465c9', network: 'ethernet').then (configuration) ->
+ * init.initialize('my/rpi.img', 'raspberry-pi', network: 'ethernet').then (configuration) ->
  *
  * 	configuration.on('stdout', process.stdout.write)
  * 	configuration.on('stderr', process.stderr.write)
@@ -116,8 +118,8 @@ exports.configure = function(image, uuid, options) {
  * 		console.log('Configuration finished')
  */
 
-exports.initialize = function(image, uuid, options) {
-  return utils.getManifestByDevice(uuid).then(function(manifest) {
+exports.initialize = function(image, deviceType, options) {
+  return resin.models.device.getManifestBySlug(deviceType).then(function(manifest) {
     return operations.execute(image, manifest.initialization.operations, options);
   });
 };

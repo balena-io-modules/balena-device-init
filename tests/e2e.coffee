@@ -141,7 +141,7 @@ wary.it 'should initialize a raspberry pi image',
 
 	init.configure(images.raspberrypi, UUIDS.raspberrypi, options)
 	.then(waitStream).then ->
-		init.initialize(images.raspberrypi, UUIDS.raspberrypi, drive: images.random)
+		init.initialize(images.raspberrypi, 'raspberry-pi', drive: images.random)
 	.then(waitStream).then ->
 		Promise.props
 			raspberrypi: fs.readFileAsync(images.raspberrypi)
@@ -161,7 +161,7 @@ wary.it 'should emit state events when initializing a raspberry pi',
 
 	init.configure(images.raspberrypi, UUIDS.raspberrypi, options)
 	.then(waitStream).then ->
-		init.initialize(images.raspberrypi, UUIDS.raspberrypi, drive: images.random)
+		init.initialize(images.raspberrypi, 'raspberry-pi', drive: images.random)
 	.then (initialization) ->
 		initialization.on('state', spy)
 		return waitStream(initialization)
@@ -182,7 +182,7 @@ wary.it 'should emit burn events when initializing a raspberry pi',
 
 	init.configure(images.raspberrypi, UUIDS.raspberrypi, options)
 	.then(waitStream).then ->
-		init.initialize(images.raspberrypi, UUIDS.raspberrypi, drive: images.random)
+		init.initialize(images.raspberrypi, 'raspberry-pi', drive: images.random)
 	.then (initialization) ->
 		initialization.on('burn', spy)
 		return waitStream(initialization)
@@ -305,7 +305,7 @@ wary.it 'should be able to initialize an intel edison with a script',
 		init.configure(images.edison, UUIDS.edison, options)
 		.then(waitStream)
 		.then ->
-			init.initialize(images.edison, UUIDS.edison, options)
+			init.initialize(images.edison, 'intel-edison', options)
 		.then (initialization) ->
 
 			initialization.on 'stdout', (data) ->
