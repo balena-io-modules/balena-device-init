@@ -27,6 +27,7 @@ THE SOFTWARE.
 ###
 
 Promise = require('bluebird')
+resin = require('resin-sdk')
 deviceConfig = require('resin-device-config')
 operations = require('resin-device-operations')
 utils = require('./utils')
@@ -81,13 +82,13 @@ exports.configure = (image, uuid, options) ->
 # @public
 #
 # @param {String} image - path to image
-# @param {String} uuid - device uuid
+# @param {String} deviceType - device type slug
 # @param {Object} options - configuration options
 #
 # @returns {Promise<EventEmitter>} initialization event emitter
 #
 # @example
-# init.initialize('my/rpi.img', '7cf02a62a3a84440b1bb5579a3d57469148943278630b17e7fc6c4f7b465c9', network: 'ethernet').then (configuration) ->
+# init.initialize('my/rpi.img', 'raspberry-pi', network: 'ethernet').then (configuration) ->
 #
 # 	configuration.on('stdout', process.stdout.write)
 # 	configuration.on('stderr', process.stderr.write)
@@ -105,6 +106,6 @@ exports.configure = (image, uuid, options) ->
 # 	configuration.on 'end', ->
 # 		console.log('Configuration finished')
 ###
-exports.initialize = (image, uuid, options) ->
-	utils.getManifestByDevice(uuid).then (manifest) ->
+exports.initialize = (image, deviceType, options) ->
+	resin.models.device.getManifestBySlug(deviceType).then (manifest) ->
 		return operations.execute(image, manifest.initialization.operations, options)
