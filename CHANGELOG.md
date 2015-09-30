@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.0.0] - 2015-09-30
+
+- Take a device type instead of a uuid in `initialize()`.
+
 ## [1.0.4] - 2015-09-08
 
 - Upgrade `resin-device-operations` to v1.2.5.
@@ -27,6 +31,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 - Upgrade `resin-device-operations` to v1.2.4.
 
+[2.0.0]: https://github.com/resin-io/resin-device-init/compare/v1.0.4...v2.0.0
 [1.0.4]: https://github.com/resin-io/resin-device-init/compare/v1.0.3...v1.0.4
 [1.0.3]: https://github.com/resin-io/resin-device-init/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/resin-io/resin-device-init/compare/v1.0.1...v1.0.2
