@@ -293,10 +293,6 @@ wary.it 'should be able to initialize an intel edison with a script',
 		network: 'wifi'
 		wifiSsid: 'mywifissid'
 		wifiKey: 'mywifikey'
-		os: os.platform()
-
-	if options.os is 'darwin'
-		options.os = 'osx'
 
 	stdout = ''
 	stderr = ''
