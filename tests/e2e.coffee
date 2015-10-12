@@ -20,8 +20,8 @@ prepareDevice = (deviceType) ->
 	resin.models.application.has(applicationName).then (hasApplication) ->
 		return if hasApplication
 		resin.models.application.create(applicationName, deviceType)
-	.then ->
-		uuid = resin.models.device.generateUUID()
+	.then(resin.models.device.generateUUID)
+	.then (uuid) ->
 		resin.models.device.register(applicationName, uuid)
 	.get('uuid')
 
@@ -323,6 +323,7 @@ resin.auth.login
 	username: process.env.RESIN_E2E_USERNAME
 	password: process.env.RESIN_E2E_PASSWORD
 .then ->
+	console.log('Logged in')
 	Promise.props
 		raspberrypi: prepareDevice('Raspberry Pi')
 		edison: prepareDevice('Intel Edison')
