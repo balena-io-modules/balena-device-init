@@ -64,7 +64,7 @@ wary.it 'should add a correct config.json to a raspberry pi',
 		.then(JSON.parse)
 		.then (config) ->
 			m.chai.expect(config.deviceType).to.equal('raspberry-pi')
-			m.chai.expect(config.applicationId).to.equal(String(device.application[0].id))
+			m.chai.expect(config.applicationId).to.equal(device.application[0].id)
 			m.chai.expect(config.deviceId).to.equal(device.id)
 			m.chai.expect(config.uuid).to.equal(UUIDS.raspberrypi)
 
@@ -233,7 +233,7 @@ wary.it 'should default appUpdatePollInterval to 1 second',
 		.then(extract)
 		.then(JSON.parse)
 		.then (config) ->
-			m.chai.expect(config.appUpdatePollInterval).to.equal('60000')
+			m.chai.expect(config.appUpdatePollInterval).to.equal(60000)
 
 ########################################################################
 # Intel Edison
@@ -258,7 +258,7 @@ wary.it 'should add a correct config.json to an intel edison',
 		.then(JSON.parse)
 		.then (config) ->
 			m.chai.expect(config.deviceType).to.equal('intel-edison')
-			m.chai.expect(config.applicationId).to.equal(String(device.application[0].id))
+			m.chai.expect(config.applicationId).to.equal(device.application[0].id)
 			m.chai.expect(config.deviceId).to.equal(device.id)
 			m.chai.expect(config.uuid).to.equal(UUIDS.edison)
 
@@ -316,7 +316,7 @@ wary.it 'should be able to initialize an intel edison with a script',
 			m.chai.expect(stderr).to.equal('')
 
 resin.auth.login
-	username: process.env.RESIN_E2E_USERNAME
+	email: process.env.RESIN_E2E_USERNAME
 	password: process.env.RESIN_E2E_PASSWORD
 .then ->
 	console.log('Logged in')
