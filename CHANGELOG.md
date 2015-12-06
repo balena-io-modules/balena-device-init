@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.0.2] - 2015-12-05
+
+- Omit tests from NPM package.
+
 ## [2.0.1] - 2015-10-12
 
 - Upgrade to Resin SDK v3.0.0.
@@ -35,6 +39,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 - Upgrade `resin-device-operations` to v1.2.4.
 
+[2.0.2]: https://github.com/resin-io/resin-device-init/compare/v2.0.1...v2.0.2
 [2.0.1]: https://github.com/resin-io/resin-device-init/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/resin-io/resin-device-init/compare/v1.0.4...v2.0.0
 [1.0.4]: https://github.com/resin-io/resin-device-init/compare/v1.0.3...v1.0.4
