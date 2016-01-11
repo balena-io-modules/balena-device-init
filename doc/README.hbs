@@ -5,6 +5,8 @@ resin-device-init
 [![dependencies](https://david-dm.org/resin-io/resin-device-init.png)](https://david-dm.org/resin-io/resin-device-init.png)
 [![Build Status](https://travis-ci.org/resin-io/resin-device-init.svg?branch=master)](https://travis-ci.org/resin-io/resin-device-init)
 
+Join our online chat at [![Gitter chat](https://badges.gitter.im/resin-io/chat.png)](https://gitter.im/resin-io/chat)
+
 Configure and initialize devices using device specs.
 
 Role
