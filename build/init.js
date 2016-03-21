@@ -65,7 +65,7 @@ utils = require('./utils');
 exports.configure = function(image, uuid, options) {
   return Promise.props({
     manifest: utils.getManifestByDevice(uuid),
-    config: deviceConfig.get(uuid, options)
+    config: deviceConfig.getByDevice(uuid, options)
   }).then(function(results) {
     var configuration;
     configuration = results.manifest.configuration;
