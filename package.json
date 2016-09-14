@@ -44,6 +44,7 @@
     "resin-device-operations": "^1.2.5",
     "resin-image-fs": "^2.1.0",
     "resin-sdk": "^5.2.0",
+    "rindle": "^1.3.0",
     "string-to-stream": "^1.0.1"
   }
 }

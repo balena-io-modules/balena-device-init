@@ -14,9 +14,11 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-var Promise, _, imagefs, path, resin, stringToStream;
+var Promise, _, imagefs, path, resin, rindle, stringToStream;
 
 Promise = require('bluebird');
+
+rindle = Promise.promisifyAll(require('rindle'));
 
 _ = require('lodash');
 
@@ -30,20 +32,29 @@ resin = require('resin-sdk');
 
 
 /**
- * @summary Get device type manifest by uuid
+ * @summary Get device type manifest by a device type name
  * @function
  * @protected
  *
- * @param {String} uuid - uuid
+ * @param {String} image - path to image
+ * @param {String} deviceType - device type slug
  * @returns {Promise<Object>} device type manifest
  *
  * @example
- * utils.getManifestByDevice('...').then (manifest) ->
+ * utils.getManifestByDeviceType('path/to/image.img', 'raspberry-pi').then (manifest) ->
  * 	console.log(manifest)
  */
 
-exports.getManifestByDevice = function(uuid) {
-  return resin.models.device.get(uuid).get('device_type').then(resin.models.device.getManifestBySlug);
+exports.getManifestByDeviceType = function(image, deviceType) {
+  return imagefs.read({
+    image: image,
+    partition: {
+      primary: 1
+    },
+    path: '/device-type.json'
+  }).then(rindle.extractAsync).then(JSON.parse)["catch"](function() {
+    return resin.models.device.getManifestBySlug(deviceType);
+  });
 };
 
 

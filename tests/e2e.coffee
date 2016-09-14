@@ -10,6 +10,7 @@ imagefs = require('resin-image-fs')
 init = require('../lib/init')
 
 RASPBERRYPI = path.join(__dirname, 'images', 'raspberrypi.img')
+RASPBERRYPI_WITH_DEVICE_TYPE = path.join(__dirname, 'images', 'raspberrypi-with-device-type.img')
 EDISON = path.join(__dirname, 'images', 'edison')
 RANDOM = path.join(__dirname, 'images', 'device.random')
 UUIDS = {}
@@ -58,6 +59,29 @@ wary.it 'should add a correct config.json to a raspberry pi',
 			partition:
 				primary: 4
 				logical: 1
+			path: '/config.json'
+			image: images.raspberrypi
+		.then(extract)
+		.then(JSON.parse)
+		.then (config) ->
+			m.chai.expect(config.deviceType).to.equal('raspberry-pi')
+			m.chai.expect(config.applicationId).to.equal(device.application[0].id)
+			m.chai.expect(config.deviceId).to.equal(device.id)
+			m.chai.expect(config.uuid).to.equal(UUIDS.raspberrypi)
+
+wary.it 'should add a correct config.json to a raspberry pi containing a device type',
+	raspberrypi: RASPBERRYPI_WITH_DEVICE_TYPE
+, (images) ->
+
+	options =
+		network: 'ethernet'
+
+	resin.models.device.get(UUIDS.raspberrypi).then (device) ->
+		init.configure(images.raspberrypi, UUIDS.raspberrypi, options)
+		.then(waitStream)
+		.then _.partial imagefs.read,
+			partition:
+				primary: 1
 			path: '/config.json'
 			image: images.raspberrypi
 		.then(extract)
@@ -142,6 +166,28 @@ wary.it 'should initialize a raspberry pi image',
 	init.configure(images.raspberrypi, UUIDS.raspberrypi, options)
 	.then(waitStream).then ->
 		init.initialize(images.raspberrypi, 'raspberry-pi', drive: images.random)
+	.then(waitStream).then ->
+		Promise.props
+			raspberrypi: fs.readFileAsync(images.raspberrypi)
+			random: fs.readFileAsync(images.random)
+		.then (results) ->
+			m.chai.expect(results.random).to.deep.equal(results.raspberrypi)
+
+wary.it 'should initialize a raspberry pi image containing a device type',
+	raspberrypi: RASPBERRYPI_WITH_DEVICE_TYPE
+	random: RANDOM
+, (images) ->
+
+	options =
+		network: 'ethernet'
+
+	init.configure(images.raspberrypi, UUIDS.raspberrypi, options)
+	.then(waitStream).then ->
+
+		# We use a non-sense device type name here to make
+		# sure the device-type.json file is read from the device
+		init.initialize(images.raspberrypi, 'foobar', drive: images.random)
+
 	.then(waitStream).then ->
 		Promise.props
 			raspberrypi: fs.readFileAsync(images.raspberrypi)
@@ -321,8 +367,8 @@ resin.auth.login
 .then ->
 	console.log('Logged in')
 	Promise.props
-		raspberrypi: prepareDevice('Raspberry Pi')
-		edison: prepareDevice('Intel Edison')
+		raspberrypi: prepareDevice('raspberry-pi')
+		edison: prepareDevice('intel-edison')
 .then (uuids) ->
 	UUIDS = uuids
 	wary.run().catch (error) ->
