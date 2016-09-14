@@ -56,7 +56,8 @@ utils = require('./utils')
 ###
 exports.configure = (image, uuid, options) ->
 	Promise.props
-		manifest: utils.getManifestByDevice(uuid)
+		manifest: resin.models.device.get(uuid).then (device) ->
+			utils.getManifestByDeviceType(image, device.device_type)
 		config: deviceConfig.getByDevice(uuid, options)
 	.then (results) ->
 		configuration = results.manifest.configuration
@@ -99,5 +100,5 @@ exports.configure = (image, uuid, options) ->
 # 		console.log('Configuration finished')
 ###
 exports.initialize = (image, deviceType, options) ->
-	resin.models.device.getManifestBySlug(deviceType).then (manifest) ->
+	utils.getManifestByDeviceType(image, deviceType).then (manifest) ->
 		return operations.execute(image, manifest.initialization.operations, options)

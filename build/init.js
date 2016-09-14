@@ -64,7 +64,9 @@ utils = require('./utils');
 
 exports.configure = function(image, uuid, options) {
   return Promise.props({
-    manifest: utils.getManifestByDevice(uuid),
+    manifest: resin.models.device.get(uuid).then(function(device) {
+      return utils.getManifestByDeviceType(image, device.device_type);
+    }),
     config: deviceConfig.getByDevice(uuid, options)
   }).then(function(results) {
     var configuration;
@@ -111,7 +113,7 @@ exports.configure = function(image, uuid, options) {
  */
 
 exports.initialize = function(image, deviceType, options) {
-  return resin.models.device.getManifestBySlug(deviceType).then(function(manifest) {
+  return utils.getManifestByDeviceType(image, deviceType).then(function(manifest) {
     return operations.execute(image, manifest.initialization.operations, options);
   });
 };

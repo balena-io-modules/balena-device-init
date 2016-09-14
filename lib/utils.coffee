@@ -15,6 +15,7 @@ limitations under the License.
 ###
 
 Promise = require('bluebird')
+rindle = Promise.promisifyAll(require('rindle'))
 _ = require('lodash')
 path = require('path')
 stringToStream = require('string-to-stream')
@@ -22,21 +23,32 @@ imagefs = require('resin-image-fs')
 resin = require('resin-sdk')
 
 ###*
-# @summary Get device type manifest by uuid
+# @summary Get device type manifest by a device type name
 # @function
 # @protected
 #
-# @param {String} uuid - uuid
+# @param {String} image - path to image
+# @param {String} deviceType - device type slug
 # @returns {Promise<Object>} device type manifest
 #
 # @example
-# utils.getManifestByDevice('...').then (manifest) ->
+# utils.getManifestByDeviceType('path/to/image.img', 'raspberry-pi').then (manifest) ->
 # 	console.log(manifest)
 ###
-exports.getManifestByDevice = (uuid) ->
-	resin.models.device.get(uuid)
-		.get('device_type')
-		.then(resin.models.device.getManifestBySlug)
+exports.getManifestByDeviceType = (image, deviceType) ->
+
+	# Attempt to read manifest from the first
+	# partition, but fallback to the API if
+	# we encounter any errors along the way.
+	imagefs.read
+		image: image
+		partition:
+			primary: 1
+		path: '/device-type.json'
+	.then(rindle.extractAsync)
+	.then(JSON.parse)
+	.catch ->
+		resin.models.device.getManifestBySlug(deviceType)
 
 ###*
 # @summary Write config.json to image
