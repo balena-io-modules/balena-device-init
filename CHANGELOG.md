@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.1.0] - 2016-09-14
+
+- Attempt to get `device-type.json` from the image's first partition.
+
 ## [2.0.4] - 2016-04-08
 
 - Support shorter uuids.
@@ -47,6 +51,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 - Upgrade `resin-device-operations` to v1.2.4.
 
+[2.1.0]: https://github.com/resin-io/resin-device-init/compare/v2.0.4...v2.1.0
 [2.0.4]: https://github.com/resin-io/resin-device-init/compare/v2.0.3...v2.0.4
 [2.0.3]: https://github.com/resin-io/resin-device-init/compare/v2.0.2...v2.0.3
 [2.0.2]: https://github.com/resin-io/resin-device-init/compare/v2.0.1...v2.0.2
