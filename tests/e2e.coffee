@@ -5,7 +5,7 @@ path = require('path')
 Promise = require('bluebird')
 fs = Promise.promisifyAll(require('fs'))
 wary = require('wary')
-resin = require('resin-sdk')
+resin = require('resin-sdk-preconfigured')
 imagefs = require('resin-image-fs')
 init = require('../lib/init')
 
@@ -21,7 +21,7 @@ prepareDevice = (deviceType) ->
 	resin.models.application.has(applicationName).then (hasApplication) ->
 		return if hasApplication
 		resin.models.application.create(applicationName, deviceType)
-	.then(resin.models.device.generateUUID)
+	.then(resin.models.device.generateUniqueKey)
 	.then (uuid) ->
 		resin.models.device.register(applicationName, uuid)
 	.get('uuid')
