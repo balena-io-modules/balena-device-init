@@ -358,7 +358,7 @@ wary.it 'should be able to initialize an intel edison with a script',
 			m.chai.expect(stderr).to.equal('')
 
 resin.auth.login
-	email: process.env.RESIN_E2E_USERNAME
+	email: process.env.RESIN_E2E_EMAIL
 	password: process.env.RESIN_E2E_PASSWORD
 .then ->
 	console.log('Logged in')
