@@ -57,8 +57,7 @@ wary.it 'should add a correct config.json to a raspberry pi',
 		.then(waitStream)
 		.then _.partial imagefs.read,
 			partition:
-				primary: 4
-				logical: 1
+				primary: 1
 			path: '/config.json'
 			image: images.raspberrypi
 		.then(extract)
@@ -81,7 +80,8 @@ wary.it 'should add a correct config.json to a raspberry pi containing a device 
 		.then(waitStream)
 		.then _.partial imagefs.read,
 			partition:
-				primary: 1
+				primary: 4
+				logical: 1
 			path: '/config.json'
 			image: images.raspberrypi
 		.then(extract)
@@ -103,8 +103,7 @@ wary.it 'should configure a raspberry pi with ethernet',
 	.then(waitStream)
 	.then _.partial imagefs.read,
 		partition:
-			primary: 4
-			logical: 1
+			primary: 1
 		path: '/config.json'
 		image: images.raspberrypi
 	.then(extract)
@@ -127,8 +126,7 @@ wary.it 'should configure a raspberry pi with wifi',
 	.then(waitStream)
 	.then _.partial imagefs.read,
 		partition:
-			primary: 4
-			logical: 1
+			primary: 1
 		path: '/config.json'
 		image: images.raspberrypi
 	.then(extract)
@@ -251,8 +249,7 @@ wary.it 'should accept an appUpdatePollInterval setting',
 		.then(waitStream)
 		.then _.partial imagefs.read,
 			partition:
-				primary: 4
-				logical: 1
+				primary: 1
 			path: '/config.json'
 			image: images.raspberrypi
 		.then(extract)
@@ -272,8 +269,7 @@ wary.it 'should default appUpdatePollInterval to 1 second',
 		.then(waitStream)
 		.then _.partial imagefs.read,
 			partition:
-				primary: 4
-				logical: 1
+				primary: 1
 			path: '/config.json'
 			image: images.raspberrypi
 		.then(extract)
@@ -298,7 +294,7 @@ wary.it 'should add a correct config.json to an intel edison',
 		init.configure(images.edison, UUIDS.edison, options)
 		.then(waitStream)
 		.then _.partial imagefs.read,
-			image: path.join(images.edison, 'config.img')
+			image: path.join(images.edison, 'resin-image-edison.hddimg')
 			path: '/config.json'
 		.then(extract)
 		.then(JSON.parse)
