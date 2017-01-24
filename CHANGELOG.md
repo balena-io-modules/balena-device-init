@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+### Changed
+
+- Moved to [resin-sdk-preconfigured](https://github.com/resin-io-modules/resin-sdk-preconfigured)
+
 ## [2.1.0] - 2016-09-14
 
 - Attempt to get `device-type.json` from the image's first partition.

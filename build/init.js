@@ -22,7 +22,7 @@ var Promise, deviceConfig, operations, resin, utils;
 
 Promise = require('bluebird');
 
-resin = require('resin-sdk');
+resin = require('resin-sdk-preconfigured');
 
 deviceConfig = require('resin-device-config');
 

@@ -30,10 +30,11 @@ Documentation
 
 
 * [init](#module_init)
-  * [.configure(image, uuid, options)](#module_init.configure) ⇒ <code>Promise.&lt;EventEmitter&gt;</code>
-  * [.initialize(image, deviceType, options)](#module_init.initialize) ⇒ <code>Promise.&lt;EventEmitter&gt;</code>
+    * [.configure(image, uuid, options)](#module_init.configure) ⇒ <code>Promise.&lt;EventEmitter&gt;</code>
+    * [.initialize(image, deviceType, options)](#module_init.initialize) ⇒ <code>Promise.&lt;EventEmitter&gt;</code>
 
 <a name="module_init.configure"></a>
+
 ### init.configure(image, uuid, options) ⇒ <code>Promise.&lt;EventEmitter&gt;</code>
 This function injects `config.json` into the device.
 
@@ -66,6 +67,7 @@ init.configure('my/rpi.img', '7cf02a62a3a84440b1bb5579a3d57469148943278630b17e7f
 		console.log('Configuration finished')
 ```
 <a name="module_init.initialize"></a>
+
 ### init.initialize(image, deviceType, options) ⇒ <code>Promise.&lt;EventEmitter&gt;</code>
 **Kind**: static method of <code>[init](#module_init)</code>  
 **Summary**: Initialize an image  
@@ -123,6 +125,12 @@ Before submitting a PR, please make sure that you include tests, and that [coffe
 
 ```sh
 $ gulp lint
+```
+
+To run the tests, you'll need to ensure that `RESIN_E2E_EMAIL` and `RESIN_E2E_PASSWORD` in your environment are set to valid credentials for a test user on [resinstaging.io](https://resinstaging.io). You can then run the tests with:
+
+```sh
+npm test
 ```
 
 License

@@ -19,7 +19,7 @@ limitations under the License.
 ###
 
 Promise = require('bluebird')
-resin = require('resin-sdk')
+resin = require('resin-sdk-preconfigured')
 deviceConfig = require('resin-device-config')
 operations = require('resin-device-operations')
 utils = require('./utils')

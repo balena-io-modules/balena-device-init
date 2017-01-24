@@ -20,7 +20,7 @@ _ = require('lodash')
 path = require('path')
 stringToStream = require('string-to-stream')
 imagefs = require('resin-image-fs')
-resin = require('resin-sdk')
+resin = require('resin-sdk-preconfigured')
 
 ###*
 # @summary Get device type manifest by a device type name

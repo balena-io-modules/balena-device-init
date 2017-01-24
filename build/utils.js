@@ -28,7 +28,7 @@ stringToStream = require('string-to-stream');
 
 imagefs = require('resin-image-fs');
 
-resin = require('resin-sdk');
+resin = require('resin-sdk-preconfigured');
 
 
 /**
