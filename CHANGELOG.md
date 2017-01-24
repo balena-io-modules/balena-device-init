@@ -3,6 +3,8 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.1.1] - 2017-01-24
+
 ### Changed
 
 - Moved to [resin-sdk-preconfigured](https://github.com/resin-io-modules/resin-sdk-preconfigured)
@@ -55,6 +57,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 - Upgrade `resin-device-operations` to v1.2.4.
 
+[2.1.1]: https://github.com/resin-io/resin-device-init/compare/v2.1.0...v2.1.1
 [2.1.0]: https://github.com/resin-io/resin-device-init/compare/v2.0.4...v2.1.0
 [2.0.4]: https://github.com/resin-io/resin-device-init/compare/v2.0.3...v2.0.4
 [2.0.3]: https://github.com/resin-io/resin-device-init/compare/v2.0.2...v2.0.3
