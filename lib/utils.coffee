@@ -16,7 +16,6 @@ limitations under the License.
 
 Promise = require('bluebird')
 rindle = Promise.promisifyAll(require('rindle'))
-_ = require('lodash')
 path = require('path')
 stringToStream = require('string-to-stream')
 imagefs = require('resin-image-fs')
