@@ -161,9 +161,13 @@ wary.it 'should initialize a raspberry pi image',
 	options =
 		network: 'ethernet'
 
+	drive =
+		raw: images.random
+		size: fs.statSync(images.random).size
+
 	init.configure(images.raspberrypi, UUIDS.raspberrypi, options)
 	.then(waitStream).then ->
-		init.initialize(images.raspberrypi, 'raspberry-pi', drive: images.random)
+		init.initialize(images.raspberrypi, 'raspberry-pi', { drive })
 	.then(waitStream).then ->
 		Promise.props
 			raspberrypi: fs.readFileAsync(images.raspberrypi)
@@ -179,12 +183,16 @@ wary.it 'should initialize a raspberry pi image containing a device type',
 	options =
 		network: 'ethernet'
 
+	drive =
+		raw: images.random
+		size: fs.statSync(images.random).size
+
 	init.configure(images.raspberrypi, UUIDS.raspberrypi, options)
 	.then(waitStream).then ->
 
 		# We use a non-sense device type name here to make
 		# sure the device-type.json file is read from the device
-		init.initialize(images.raspberrypi, 'foobar', drive: images.random)
+		init.initialize(images.raspberrypi, 'foobar', { drive })
 
 	.then(waitStream).then ->
 		Promise.props
@@ -201,11 +209,15 @@ wary.it 'should emit state events when initializing a raspberry pi',
 	options =
 		network: 'ethernet'
 
+	drive =
+		raw: images.random
+		size: fs.statSync(images.random).size
+
 	spy = m.sinon.spy()
 
 	init.configure(images.raspberrypi, UUIDS.raspberrypi, options)
 	.then(waitStream).then ->
-		init.initialize(images.raspberrypi, 'raspberry-pi', drive: images.random)
+		init.initialize(images.raspberrypi, 'raspberry-pi', { drive })
 	.then (initialization) ->
 		initialization.on('state', spy)
 		return waitStream(initialization)
@@ -222,11 +234,15 @@ wary.it 'should emit burn events when initializing a raspberry pi',
 	options =
 		network: 'ethernet'
 
+	drive =
+		raw: images.random
+		size: fs.statSync(images.random).size
+
 	spy = m.sinon.spy()
 
 	init.configure(images.raspberrypi, UUIDS.raspberrypi, options)
 	.then(waitStream).then ->
-		init.initialize(images.raspberrypi, 'raspberry-pi', drive: images.random)
+		init.initialize(images.raspberrypi, 'raspberry-pi', { drive })
 	.then (initialization) ->
 		initialization.on('burn', spy)
 		return waitStream(initialization)
@@ -357,9 +373,12 @@ wary.it 'should be able to initialize an intel edison with a script',
 			m.chai.expect(stdout.replace(/[\n\r]/g, '')).to.equal('Hello World')
 			m.chai.expect(stderr).to.equal('')
 
-resin.auth.login
-	email: process.env.RESIN_E2E_EMAIL
-	password: process.env.RESIN_E2E_PASSWORD
+Promise.try ->
+	require('dotenv').config(silent: true)
+.then ->
+	resin.auth.login
+		email: process.env.RESIN_E2E_EMAIL
+		password: process.env.RESIN_E2E_PASSWORD
 .then ->
 	console.log('Logged in')
 	Promise.props
@@ -367,6 +386,7 @@ resin.auth.login
 		edison: prepareDevice('intel-edison')
 .then (uuids) ->
 	UUIDS = uuids
-	wary.run().catch (error) ->
-		console.error(error, error.stack)
-		process.exit(1)
+	wary.run()
+.catch (error) ->
+	console.error(error, error.stack)
+	process.exit(1)

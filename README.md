@@ -109,6 +109,14 @@ If you're having any problem, please [raise an issue](https://github.com/resin-i
 Tests
 -----
 
+Create an `.env` file and put the following lines in it, replacing the asterisks
+with the valid credentials for a test user on [resinstaging.io](https://resinstaging.io)
+
+```
+RESIN_E2E_EMAIL=***
+RESIN_E2E_PASSWORD=***
+```
+
 Run the test suite by doing:
 
 ```sh
@@ -127,7 +135,7 @@ Before submitting a PR, please make sure that you include tests, and that [coffe
 $ gulp lint
 ```
 
-To run the tests, you'll need to ensure that `RESIN_E2E_EMAIL` and `RESIN_E2E_PASSWORD` in your environment are set to valid credentials for a test user on [resinstaging.io](https://resinstaging.io). You can then run the tests with:
+You can then run the tests with:
 
 ```sh
 npm test
