@@ -52,7 +52,7 @@ wary.it 'should add a correct config.json to a raspberry pi',
 		network: 'ethernet'
 
 	resin.models.device.get(DEVICES.raspberrypi.id).then (device) ->
-		init.configure(images.raspberrypi, DEVICES.raspberrypi.uuid, options)
+		init.configure(images.raspberrypi, DEVICES.raspberrypi.uuid, DEVICES.raspberrypi.api_key, options)
 		.then(waitStream)
 		.then _.partial imagefs.read,
 			partition:
@@ -66,6 +66,7 @@ wary.it 'should add a correct config.json to a raspberry pi',
 			m.chai.expect(config.applicationId).to.equal(device.application[0].id)
 			m.chai.expect(config.deviceId).to.equal(DEVICES.raspberrypi.id)
 			m.chai.expect(config.uuid).to.equal(DEVICES.raspberrypi.uuid)
+			m.chai.expect(config.deviceApiKey).to.equal(DEVICES.raspberrypi.api_key)
 
 wary.it 'should add a correct config.json to a raspberry pi containing a device type',
 	raspberrypi: RASPBERRYPI_WITH_DEVICE_TYPE
@@ -75,7 +76,7 @@ wary.it 'should add a correct config.json to a raspberry pi containing a device 
 		network: 'ethernet'
 
 	resin.models.device.get(DEVICES.raspberrypi.id).then (device) ->
-		init.configure(images.raspberrypi, DEVICES.raspberrypi.uuid, options)
+		init.configure(images.raspberrypi, DEVICES.raspberrypi.uuid, DEVICES.raspberrypi.api_key, options)
 		.then(waitStream)
 		.then _.partial imagefs.read,
 			partition:
@@ -90,6 +91,7 @@ wary.it 'should add a correct config.json to a raspberry pi containing a device 
 			m.chai.expect(config.applicationId).to.equal(device.application[0].id)
 			m.chai.expect(config.deviceId).to.equal(DEVICES.raspberrypi.id)
 			m.chai.expect(config.uuid).to.equal(DEVICES.raspberrypi.uuid)
+			m.chai.expect(config.deviceApiKey).to.equal(DEVICES.raspberrypi.api_key)
 
 wary.it 'should configure a raspberry pi with ethernet',
 	raspberrypi: RASPBERRYPI
@@ -98,7 +100,7 @@ wary.it 'should configure a raspberry pi with ethernet',
 	options =
 		network: 'ethernet'
 
-	init.configure(images.raspberrypi, DEVICES.raspberrypi.uuid, options)
+	init.configure(images.raspberrypi, DEVICES.raspberrypi.uuid, DEVICES.raspberrypi.api_key, options)
 	.then(waitStream)
 	.then _.partial imagefs.read,
 		partition:
@@ -121,7 +123,7 @@ wary.it 'should configure a raspberry pi with wifi',
 		wifiSsid: 'mywifissid'
 		wifiKey: 'mywifikey'
 
-	init.configure(images.raspberrypi, DEVICES.raspberrypi.uuid, options)
+	init.configure(images.raspberrypi, DEVICES.raspberrypi.uuid, DEVICES.raspberrypi.api_key, options)
 	.then(waitStream)
 	.then _.partial imagefs.read,
 		partition:
@@ -145,7 +147,7 @@ wary.it 'should not trigger a stat event when configuring a rasperry pi',
 
 	spy = m.sinon.spy()
 
-	init.configure(images.raspberrypi, DEVICES.raspberrypi.uuid, options)
+	init.configure(images.raspberrypi, DEVICES.raspberrypi.uuid, DEVICES.raspberrypi.api_key, options)
 	.then (configuration) ->
 		configuration.on('state', spy)
 		return waitStream(configuration)
@@ -164,7 +166,7 @@ wary.it 'should initialize a raspberry pi image',
 		raw: images.random
 		size: fs.statSync(images.random).size
 
-	init.configure(images.raspberrypi, DEVICES.raspberrypi.uuid, options)
+	init.configure(images.raspberrypi, DEVICES.raspberrypi.uuid, DEVICES.raspberrypi.api_key, options)
 	.then(waitStream).then ->
 		init.initialize(images.raspberrypi, 'raspberry-pi', { drive })
 	.then(waitStream).then ->
@@ -186,7 +188,7 @@ wary.it 'should initialize a raspberry pi image containing a device type',
 		raw: images.random
 		size: fs.statSync(images.random).size
 
-	init.configure(images.raspberrypi, DEVICES.raspberrypi.uuid, options)
+	init.configure(images.raspberrypi, DEVICES.raspberrypi.uuid, DEVICES.raspberrypi.api_key, options)
 	.then(waitStream).then ->
 
 		# We use a non-sense device type name here to make
@@ -214,7 +216,7 @@ wary.it 'should emit state events when initializing a raspberry pi',
 
 	spy = m.sinon.spy()
 
-	init.configure(images.raspberrypi, DEVICES.raspberrypi.uuid, options)
+	init.configure(images.raspberrypi, DEVICES.raspberrypi.uuid, DEVICES.raspberrypi.api_key, options)
 	.then(waitStream).then ->
 		init.initialize(images.raspberrypi, 'raspberry-pi', { drive })
 	.then (initialization) ->
@@ -239,7 +241,7 @@ wary.it 'should emit burn events when initializing a raspberry pi',
 
 	spy = m.sinon.spy()
 
-	init.configure(images.raspberrypi, DEVICES.raspberrypi.uuid, options)
+	init.configure(images.raspberrypi, DEVICES.raspberrypi.uuid, DEVICES.raspberrypi.api_key, options)
 	.then(waitStream).then ->
 		init.initialize(images.raspberrypi, 'raspberry-pi', { drive })
 	.then (initialization) ->
@@ -259,7 +261,7 @@ wary.it 'should accept an appUpdatePollInterval setting',
 		network: 'ethernet'
 		appUpdatePollInterval: 2
 
-	init.configure(images.raspberrypi, DEVICES.raspberrypi.uuid, options)
+	init.configure(images.raspberrypi, DEVICES.raspberrypi.uuid, DEVICES.raspberrypi.api_key, options)
 	.then(waitStream)
 	.then _.partial imagefs.read,
 		partition:
@@ -278,7 +280,7 @@ wary.it 'should default appUpdatePollInterval to 1 second',
 	options =
 		network: 'ethernet'
 
-	init.configure(images.raspberrypi, DEVICES.raspberrypi.uuid, options)
+	init.configure(images.raspberrypi, DEVICES.raspberrypi.uuid, DEVICES.raspberrypi.api_key, options)
 	.then(waitStream)
 	.then _.partial imagefs.read,
 		partition:
@@ -304,7 +306,7 @@ wary.it 'should add a correct config.json to an intel edison',
 		wifiKey: 'mywifikey'
 
 	resin.models.device.get(DEVICES.edison.id).then (device) ->
-		init.configure(images.edison, DEVICES.edison.uuid, options)
+		init.configure(images.edison, DEVICES.edison.uuid, DEVICES.edison.api_key, options)
 		.then(waitStream)
 		.then _.partial imagefs.read,
 			image: path.join(images.edison, 'resin-image-edison.hddimg')
@@ -316,6 +318,7 @@ wary.it 'should add a correct config.json to an intel edison',
 			m.chai.expect(config.applicationId).to.equal(device.application[0].id)
 			m.chai.expect(config.deviceId).to.equal(DEVICES.edison.id)
 			m.chai.expect(config.uuid).to.equal(DEVICES.edison.uuid)
+			m.chai.expect(config.deviceApiKey).to.equal(DEVICES.edison.api_key)
 
 			networkConfig = config.files['network/network.config']
 			m.chai.expect(networkConfig).to.include('wifi')
@@ -333,7 +336,7 @@ wary.it 'should not trigger a stat event when configuring an intel edison',
 
 	spy = m.sinon.spy()
 
-	init.configure(images.edison, DEVICES.edison.uuid, options)
+	init.configure(images.edison, DEVICES.edison.uuid, DEVICES.edison.api_key, options)
 	.then (configuration) ->
 		configuration.on('state', spy)
 		return waitStream(configuration)
@@ -352,7 +355,7 @@ wary.it 'should be able to initialize an intel edison with a script',
 	stdout = ''
 	stderr = ''
 
-	init.configure(images.edison, DEVICES.edison.uuid, options)
+	init.configure(images.edison, DEVICES.edison.uuid, DEVICES.edison.api_key, options)
 	.then(waitStream)
 	.then ->
 		init.initialize(images.edison, 'intel-edison', options)

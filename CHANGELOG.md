@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+### Changed
+
+- Added a required `deviceApiKey` parameter to `configure`
+- Updated to resin-device-config ^4.0.0
+
 ## [2.2.1] - 2017-04-14
 
 ### Fixed
