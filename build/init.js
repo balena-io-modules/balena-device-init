@@ -64,6 +64,9 @@ utils = require('./utils');
  */
 
 exports.configure = function(image, uuid, deviceApiKey, options) {
+  if (options == null) {
+    options = {};
+  }
   return Promise.props({
     manifest: resin.models.device.get(uuid).then(function(device) {
       return utils.getManifestByDeviceType(image, device.device_type);
