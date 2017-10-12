@@ -19,8 +19,6 @@ limitations under the License.
 ###
 
 Promise = require('bluebird')
-resin = require('resin-sdk-preconfigured')
-deviceConfig = require('resin-device-config')
 operations = require('resin-device-operations')
 utils = require('./utils')
 
@@ -33,13 +31,14 @@ utils = require('./utils')
 # This function injects `config.json` into the device.
 #
 # @param {String} image - path to image
-# @param {String} uuid - device uuid
-# @param {Object} options - configuration options
+# @param {String} device type - device type slug
+# @param {Object} config - a fully populated config object
+# @param {Object} [options] - configuration options
 #
 # @returns {Promise<EventEmitter>} configuration event emitter
 #
 # @example
-# init.configure('my/rpi.img', '7cf02a62a3a84440b1bb5579a3d57469148943278630b17e7fc6c4f7b465c9', network: 'ethernet').then (configuration) ->
+# init.configure('my/rpi.img', 'raspberrypi', config).then (configuration) ->
 #
 # 	configuration.on('stdout', process.stdout.write)
 # 	configuration.on('stderr', process.stderr.write)
@@ -54,19 +53,16 @@ utils = require('./utils')
 # 	configuration.on 'end', ->
 # 		console.log('Configuration finished')
 ###
-exports.configure = (image, uuid, deviceApiKey, options = {}) ->
-	Promise.props
-		manifest: resin.models.device.get(uuid).then (device) ->
-			utils.getManifestByDeviceType(image, device.device_type)
-		config: deviceConfig.getByDevice(uuid, deviceApiKey, options)
-	.then (results) ->
-		configuration = results.manifest.configuration
+exports.configure = (image, deviceType, config, options = {}) ->
+	utils.getManifestByDeviceType(image, deviceType)
+	.then (manifest) ->
+		configuration = manifest.configuration
 
 		# Convert from seconds to milliseconds
-		if options.appUpdatePollInterval?
-			results.config.appUpdatePollInterval = String(options.appUpdatePollInterval * 60000)
+		if config.appUpdatePollInterval?
+			config.appUpdatePollInterval = String(config.appUpdatePollInterval * 60000)
 
-		utils.writeConfigJSON(image, results.config, configuration.config).then ->
+		utils.writeConfigJSON(image, config, configuration.config).then ->
 			return operations.execute(image, configuration.operations, options)
 
 ###*
@@ -100,5 +96,6 @@ exports.configure = (image, uuid, deviceApiKey, options = {}) ->
 # 		console.log('Configuration finished')
 ###
 exports.initialize = (image, deviceType, options) ->
-	utils.getManifestByDeviceType(image, deviceType).then (manifest) ->
+	utils.getManifestByDeviceType(image, deviceType)
+	.then (manifest) ->
 		return operations.execute(image, manifest.initialization.operations, options)

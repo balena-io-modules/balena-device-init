@@ -30,28 +30,29 @@ Documentation
 
 
 * [init](#module_init)
-    * [.configure(image, uuid, options)](#module_init.configure) ⇒ <code>Promise.&lt;EventEmitter&gt;</code>
+    * [.configure(image, device, config, [options])](#module_init.configure) ⇒ <code>Promise.&lt;EventEmitter&gt;</code>
     * [.initialize(image, deviceType, options)](#module_init.initialize) ⇒ <code>Promise.&lt;EventEmitter&gt;</code>
 
 <a name="module_init.configure"></a>
 
-### init.configure(image, uuid, options) ⇒ <code>Promise.&lt;EventEmitter&gt;</code>
+### init.configure(image, device, config, [options]) ⇒ <code>Promise.&lt;EventEmitter&gt;</code>
 This function injects `config.json` into the device.
 
-**Kind**: static method of <code>[init](#module_init)</code>
-**Summary**: Configure an image with an application
-**Returns**: <code>Promise.&lt;EventEmitter&gt;</code> - configuration event emitter
-**Access:** public
+**Kind**: static method of <code>[init](#module_init)</code>  
+**Summary**: Configure an image with an application  
+**Returns**: <code>Promise.&lt;EventEmitter&gt;</code> - configuration event emitter  
+**Access:** public  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | image | <code>String</code> | path to image |
-| uuid | <code>String</code> | device uuid |
-| options | <code>Object</code> | configuration options |
+| device | <code>String</code> | type - device type slug |
+| config | <code>Object</code> | a fully populated config object |
+| [options] | <code>Object</code> | configuration options |
 
-**Example**
+**Example**  
 ```js
-init.configure('my/rpi.img', '7cf02a62a3a84440b1bb5579a3d57469148943278630b17e7fc6c4f7b465c9', network: 'ethernet').then (configuration) ->
+init.configure('my/rpi.img', 'raspberrypi', config).then (configuration) ->
 
 	configuration.on('stdout', process.stdout.write)
 	configuration.on('stderr', process.stderr.write)
@@ -69,10 +70,10 @@ init.configure('my/rpi.img', '7cf02a62a3a84440b1bb5579a3d57469148943278630b17e7f
 <a name="module_init.initialize"></a>
 
 ### init.initialize(image, deviceType, options) ⇒ <code>Promise.&lt;EventEmitter&gt;</code>
-**Kind**: static method of <code>[init](#module_init)</code>
-**Summary**: Initialize an image
-**Returns**: <code>Promise.&lt;EventEmitter&gt;</code> - initialization event emitter
-**Access:** public
+**Kind**: static method of <code>[init](#module_init)</code>  
+**Summary**: Initialize an image  
+**Returns**: <code>Promise.&lt;EventEmitter&gt;</code> - initialization event emitter  
+**Access:** public  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -80,7 +81,7 @@ init.configure('my/rpi.img', '7cf02a62a3a84440b1bb5579a3d57469148943278630b17e7f
 | deviceType | <code>String</code> | device type slug |
 | options | <code>Object</code> | configuration options |
 
-**Example**
+**Example**  
 ```js
 init.initialize('my/rpi.img', 'raspberry-pi', network: 'ethernet').then (configuration) ->
 
