@@ -67,9 +67,6 @@ exports.configure = function(image, deviceType, config, options) {
   return utils.getManifestByDeviceType(image, deviceType).then(function(manifest) {
     var configuration;
     configuration = manifest.configuration;
-    if (config.appUpdatePollInterval != null) {
-      config.appUpdatePollInterval = String(config.appUpdatePollInterval * 60000);
-    }
     return utils.writeConfigJSON(image, config, configuration.config).then(function() {
       return operations.execute(image, configuration.operations, options);
     });

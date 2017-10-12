@@ -58,10 +58,6 @@ exports.configure = (image, deviceType, config, options = {}) ->
 	.then (manifest) ->
 		configuration = manifest.configuration
 
-		# Convert from seconds to milliseconds
-		if config.appUpdatePollInterval?
-			config.appUpdatePollInterval = String(config.appUpdatePollInterval * 60000)
-
 		utils.writeConfigJSON(image, config, configuration.config).then ->
 			return operations.execute(image, configuration.operations, options)
 

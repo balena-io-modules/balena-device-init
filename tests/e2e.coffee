@@ -190,26 +190,6 @@ wary.it 'should emit burn events when initializing a raspberry pi',
 		m.chai.expect(args[0].percentage).to.equal(100)
 		m.chai.expect(args[0].eta).to.equal(0)
 
-wary.it 'should accept an appUpdatePollInterval setting',
-	raspberrypi: RASPBERRYPI
-, (images) ->
-
-	config =
-		appUpdatePollInterval: 2
-
-	resin.models.device.get(DEVICES.raspberrypi.id).then (device) ->
-		init.configure(images.raspberrypi, device.device_type, config)
-	.then(waitStream)
-	.then _.partial imagefs.read,
-		partition:
-			primary: 1
-		path: '/config.json'
-		image: images.raspberrypi
-	.then(extract)
-	.then(JSON.parse)
-	.then (config) ->
-		m.chai.expect(config.appUpdatePollInterval).to.equal('120000')
-
 ########################################################################
 # Intel Edison
 ########################################################################
