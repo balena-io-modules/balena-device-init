@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+
+### Changed
+
+- Take config as an argument to `configure`, rather than generating it ourselves
+- Expect `appUpdatePollInterval` in milliseconds, not seconds, and don't stringify it
+
 ## [3.0.0] - 2017-04-17
 
 ### Changed

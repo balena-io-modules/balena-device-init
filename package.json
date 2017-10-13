@@ -42,7 +42,6 @@
   },
   "dependencies": {
     "bluebird": "^3.5.0",
-    "resin-device-config": "^4.0.0",
     "resin-device-operations": "^1.4.1",
     "resin-image-fs": "^2.1.0",
     "resin-sdk-preconfigured": "^6.0.0",
