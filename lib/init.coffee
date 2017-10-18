@@ -58,7 +58,8 @@ exports.configure = (image, deviceType, config, options = {}) ->
 	.then (manifest) ->
 		configuration = manifest.configuration
 
-		utils.writeConfigJSON(image, config, configuration.config).then ->
+		configPathDefinition = utils.convertFilePathDefinition(configuration.config)
+		utils.writeConfigJSON(image, config, configPathDefinition).then ->
 			return operations.execute(image, configuration.operations, options)
 
 ###*

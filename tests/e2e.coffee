@@ -54,12 +54,12 @@ wary.it 'should add a config.json correctly to a raspberry pi',
 	resin.models.device.get(DEVICES.raspberrypi.id).then (device) ->
 		init.configure(images.raspberrypi, device.device_type, config)
 	.then(waitStream)
-	.then _.partial imagefs.read,
-		partition:
-			primary: 1
-		path: '/config.json'
-		image: images.raspberrypi
-	.then(extract)
+	.then ->
+		Promise.using imagefs.read(
+			partition: 1
+			path: '/config.json'
+			image: images.raspberrypi
+		), extract
 	.then(JSON.parse)
 	.then (config) ->
 		m.chai.expect(config.isTestConfig).to.equal(true)
@@ -74,13 +74,12 @@ wary.it 'should add a correct config.json to a raspberry pi containing a device-
 	resin.models.device.get(DEVICES.raspberrypi.id).then (device) ->
 		init.configure(images.raspberrypi, device.device_type, config)
 	.then(waitStream)
-	.then _.partial imagefs.read,
-		partition:
-			primary: 4
-			logical: 1
-		path: '/config.json'
-		image: images.raspberrypi
-	.then(extract)
+	.then ->
+		Promise.using imagefs.read(
+			partition: 5
+			path: '/config.json'
+			image: images.raspberrypi
+		), extract
 	.then(JSON.parse)
 	.then (config) ->
 		m.chai.expect(config.isTestConfig).to.equal(true)
@@ -204,10 +203,11 @@ wary.it 'should add a config.json to an intel edison',
 	resin.models.device.get(DEVICES.edison.id).then (device) ->
 		init.configure(images.edison, device.device_type, config)
 	.then(waitStream)
-	.then _.partial imagefs.read,
-		image: path.join(images.edison, 'resin-image-edison.hddimg')
-		path: '/config.json'
-	.then(extract)
+	.then ->
+		Promise.using imagefs.read(
+			path: '/config.json'
+			image: path.join(images.edison, 'resin-image-edison.hddimg')
+		), extract
 	.then(JSON.parse)
 	.then (config) ->
 		m.chai.expect(config.isTestConfig).to.equal(true)

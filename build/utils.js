@@ -15,9 +15,11 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-var Promise, imagefs, path, resin, rindle, stringToStream;
+var Promise, _, imagefs, path, resin, rindle, stringToStream;
 
 Promise = require('bluebird');
+
+_ = require('lodash');
 
 rindle = Promise.promisifyAll(require('rindle'));
 
@@ -45,15 +47,44 @@ resin = require('resin-sdk-preconfigured');
  */
 
 exports.getManifestByDeviceType = function(image, deviceType) {
-  return imagefs.read({
+  return Promise.using(imagefs.read({
     image: image,
-    partition: {
-      primary: 1
-    },
+    partition: 1,
     path: '/device-type.json'
-  }).then(rindle.extractAsync).then(JSON.parse)["catch"](function() {
+  }), rindle.extractAsync).then(JSON.parse)["catch"](function() {
     return resin.models.device.getManifestBySlug(deviceType);
   });
+};
+
+
+/**
+ * @summary Convert a device type file definition to resin-image-fs v4 format
+ * @function
+ * @protected
+ *
+ * @param {Object} definition - write definition
+ *
+ * @returns {Object} a converted write definition
+ *
+ * @example
+ * utils.convertFileDefinition
+ * 	partition:
+ * 		primary: 4
+ * 		logical: 1
+ * 	path: '/config.json'
+ */
+
+exports.convertFilePathDefinition = function(inputDefinition) {
+  var definition;
+  definition = _.cloneDeep(inputDefinition);
+  if (_.isObject(definition.partition)) {
+    if (definition.partition.logical != null) {
+      definition.partition = definition.partition.logical + 4;
+    } else {
+      definition.partition = definition.partition.primary;
+    }
+  }
+  return definition;
 };
 
 
@@ -87,10 +118,5 @@ exports.writeConfigJSON = function(image, config, definition) {
       definition.image = image;
     }
   }
-  return new Promise(function(resolve, reject) {
-    return imagefs.write(definition, stringToStream(config)).then(function(stream) {
-      stream.on('error', reject);
-      return stream.on('close', resolve);
-    });
-  });
+  return imagefs.write(definition, stringToStream(config));
 };

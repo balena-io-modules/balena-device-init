@@ -15,6 +15,7 @@ limitations under the License.
 ###
 
 Promise = require('bluebird')
+_ = require('lodash')
 rindle = Promise.promisifyAll(require('rindle'))
 path = require('path')
 stringToStream = require('string-to-stream')
@@ -39,15 +40,44 @@ exports.getManifestByDeviceType = (image, deviceType) ->
 	# Attempt to read manifest from the first
 	# partition, but fallback to the API if
 	# we encounter any errors along the way.
-	imagefs.read
+	Promise.using imagefs.read(
 		image: image
-		partition:
-			primary: 1
+		partition: 1
 		path: '/device-type.json'
-	.then(rindle.extractAsync)
+	), rindle.extractAsync
 	.then(JSON.parse)
 	.catch ->
 		resin.models.device.getManifestBySlug(deviceType)
+
+###*
+# @summary Convert a device type file definition to resin-image-fs v4 format
+# @function
+# @protected
+#
+# @param {Object} definition - write definition
+#
+# @returns {Object} a converted write definition
+#
+# @example
+# utils.convertFileDefinition
+# 	partition:
+# 		primary: 4
+# 		logical: 1
+# 	path: '/config.json'
+###
+exports.convertFilePathDefinition = (inputDefinition) ->
+	definition = _.cloneDeep(inputDefinition)
+
+	if _.isObject(definition.partition)
+		# Partition numbering is now numerical, following the linux
+		# conventions in 5.95 of the TLDP's system admin guide:
+		# http://www.tldp.org/LDP/sag/html/partitions.html#DEV-FILES-PARTS
+		if definition.partition.logical?
+			definition.partition = definition.partition.logical + 4
+		else
+			definition.partition = definition.partition.primary
+
+	return definition
 
 ###*
 # @summary Write config.json to image
@@ -77,7 +107,4 @@ exports.writeConfigJSON = (image, config, definition) ->
 	else
 		definition.image ?= image
 
-	return new Promise (resolve, reject) ->
-		imagefs.write(definition, stringToStream(config)).then (stream) ->
-			stream.on('error', reject)
-			stream.on('close', resolve)
+	return imagefs.write(definition, stringToStream(config))

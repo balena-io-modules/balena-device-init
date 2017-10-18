@@ -65,9 +65,10 @@ exports.configure = function(image, deviceType, config, options) {
     options = {};
   }
   return utils.getManifestByDeviceType(image, deviceType).then(function(manifest) {
-    var configuration;
+    var configPathDefinition, configuration;
     configuration = manifest.configuration;
-    return utils.writeConfigJSON(image, config, configuration.config).then(function() {
+    configPathDefinition = utils.convertFilePathDefinition(configuration.config);
+    return utils.writeConfigJSON(image, config, configPathDefinition).then(function() {
       return operations.execute(image, configuration.operations, options);
     });
   });
