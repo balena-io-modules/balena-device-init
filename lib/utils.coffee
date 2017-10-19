@@ -81,6 +81,46 @@ exports.convertFilePathDefinition = (inputDefinition) ->
 	return definition
 
 ###*
+# @summary Get image OS version
+# @function
+# @protected
+#
+# @param {String} image - path to image
+# @returns {Promise<string|null>} ResinOS version, or null if it could not be determined
+#
+# @example
+# utils.getImageOsVersion('path/to/image.img').then (version) ->
+# 	console.log(version)
+###
+exports.getImageOsVersion = (image) ->
+	Promise.using imagefs.read(
+		image: image
+		partition: 2
+		path: '/etc/os-release'
+	), streamToString
+	.then (osReleaseString) ->
+		parsedOsRelease = _(osReleaseString)
+			.split('\n')
+			.map (line) ->
+				match = line.match(/(.*)=(.*)/)
+				if match
+					return [
+						match[1],
+						match[2].replace(/^"(.*)"$/, '$1').replace(/^'(.*)'$/, '$1')
+					]
+				else
+					return false
+			.filter()
+			.fromPairs()
+			.value()
+
+		if parsedOsRelease.NAME != 'Resin OS'
+			return null
+		else
+			return parsedOsRelease.VERSION || null
+	.catchReturn(null)
+
+###*
 # @summary Write config.json to image
 # @function
 # @protected

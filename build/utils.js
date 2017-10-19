@@ -15,7 +15,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-var Promise, _, imagefs, path, resin, rindle, stringToStream;
+var Promise, _, imagefs, path, resin, rindle, streamToString, stringToStream;
 
 Promise = require('bluebird');
 
@@ -26,6 +26,8 @@ rindle = Promise.promisifyAll(require('rindle'));
 path = require('path');
 
 stringToStream = require('string-to-stream');
+
+streamToString = require('stream-to-string');
 
 imagefs = require('resin-image-fs');
 
@@ -85,6 +87,44 @@ exports.convertFilePathDefinition = function(inputDefinition) {
     }
   }
   return definition;
+};
+
+
+/**
+ * @summary Get image OS version
+ * @function
+ * @protected
+ *
+ * @param {String} image - path to image
+ * @returns {Promise<string|null>} ResinOS version, or null if it could not be determined
+ *
+ * @example
+ * utils.getImageOsVersion('path/to/image.img').then (version) ->
+ * 	console.log(version)
+ */
+
+exports.getImageOsVersion = function(image) {
+  return Promise.using(imagefs.read({
+    image: image,
+    partition: 2,
+    path: '/etc/os-release'
+  }), streamToString).then(function(osReleaseString) {
+    var parsedOsRelease;
+    parsedOsRelease = _(osReleaseString).split('\n').map(function(line) {
+      var match;
+      match = line.match(/(.*)=(.*)/);
+      if (match) {
+        return [match[1], match[2].replace(/^"(.*)"$/, '$1').replace(/^'(.*)'$/, '$1')];
+      } else {
+        return false;
+      }
+    }).filter().fromPairs().value();
+    if (parsedOsRelease.NAME !== 'Resin OS') {
+      return null;
+    } else {
+      return parsedOsRelease.VERSION || null;
+    }
+  });
 };
 
 
