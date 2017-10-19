@@ -9,7 +9,8 @@ resin = require('resin-sdk-preconfigured')
 imagefs = require('resin-image-fs')
 init = require('../lib/init')
 
-RASPBERRYPI = path.join(__dirname, 'images', 'raspberrypi.img')
+RASPBERRYPI_OS1 = path.join(__dirname, 'images', 'raspberrypi-os1.img')
+RASPBERRYPI_OS2 = path.join(__dirname, 'images', 'raspberrypi-os2.img')
 RASPBERRYPI_WITH_DEVICE_TYPE = path.join(__dirname, 'images', 'raspberrypi-with-device-type.img')
 EDISON = path.join(__dirname, 'images', 'edison')
 RANDOM = path.join(__dirname, 'images', 'device.random')
@@ -45,7 +46,7 @@ waitStream = (stream) ->
 ########################################################################
 
 wary.it 'should add a config.json correctly to a raspberry pi',
-	raspberrypi: RASPBERRYPI
+	raspberrypi: RASPBERRYPI_OS1
 , (images) ->
 
 	config =
@@ -85,7 +86,7 @@ wary.it 'should add a correct config.json to a raspberry pi containing a device-
 		m.chai.expect(config.isTestConfig).to.equal(true)
 
 wary.it 'should not trigger a state event when configuring a raspberry pi',
-	raspberrypi: RASPBERRYPI
+	raspberrypi: RASPBERRYPI_OS1
 , (images) ->
 	spy = m.sinon.spy()
 
@@ -98,7 +99,7 @@ wary.it 'should not trigger a state event when configuring a raspberry pi',
 		m.chai.expect(spy).to.not.have.been.called
 
 wary.it 'should initialize a raspberry pi image',
-	raspberrypi: RASPBERRYPI
+	raspberrypi: RASPBERRYPI_OS1
 	random: RANDOM
 , (images) ->
 
@@ -142,7 +143,7 @@ wary.it 'should initialize a raspberry pi image containing a device type',
 			m.chai.expect(results.random).to.deep.equal(results.raspberrypi)
 
 wary.it 'should emit state events when initializing a raspberry pi',
-	raspberrypi: RASPBERRYPI
+	raspberrypi: RASPBERRYPI_OS1
 	random: RANDOM
 , (images) ->
 
@@ -166,7 +167,7 @@ wary.it 'should emit state events when initializing a raspberry pi',
 		m.chai.expect(args[0].percentage).to.equal(100)
 
 wary.it 'should emit burn events when initializing a raspberry pi',
-	raspberrypi: RASPBERRYPI
+	raspberrypi: RASPBERRYPI_OS1
 	random: RANDOM
 , (images) ->
 

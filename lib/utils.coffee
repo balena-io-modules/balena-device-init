@@ -19,6 +19,7 @@ _ = require('lodash')
 rindle = Promise.promisifyAll(require('rindle'))
 path = require('path')
 stringToStream = require('string-to-stream')
+streamToString = require('stream-to-string')
 imagefs = require('resin-image-fs')
 resin = require('resin-sdk-preconfigured')
 
