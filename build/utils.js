@@ -124,7 +124,7 @@ exports.getImageOsVersion = function(image) {
     } else {
       return parsedOsRelease.VERSION || null;
     }
-  });
+  }).catchReturn(null);
 };
 
 

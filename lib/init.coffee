@@ -18,9 +18,12 @@ limitations under the License.
 # @module init
 ###
 
+_ = require('lodash')
 Promise = require('bluebird')
 operations = require('resin-device-operations')
+resinSemver = require('resin-semver')
 utils = require('./utils')
+network = require('./network')
 
 ###*
 # @summary Configure an image with an application
@@ -28,7 +31,7 @@ utils = require('./utils')
 # @public
 #
 # @description
-# This function injects `config.json` into the device.
+# This function injects `config.json` and network settings into the device.
 #
 # @param {String} image - path to image
 # @param {String} device type - device type slug
@@ -56,11 +59,27 @@ utils = require('./utils')
 exports.configure = (image, deviceType, config, options = {}) ->
 	utils.getManifestByDeviceType(image, deviceType)
 	.then (manifest) ->
-		configuration = manifest.configuration
+		Promise.try ->
+			# We only know how to find /etc/os-release on specific types of OS image. In future, we'd like to be able
+			# to do this for any image, but for now we'll just treat others as unknowable (which means below we'll
+			# configure the network to work for _either_ OS version.
+			if manifest.yocto.image == 'resin-image' and _.includes(['resinos-img', 'resin-sdcard'], manifest.yocto.fstype)
+				utils.getImageOsVersion(image)
+		.then (osVersion) ->
+			configuration = manifest.configuration
 
-		configPathDefinition = utils.convertFilePathDefinition(configuration.config)
-		utils.writeConfigJSON(image, config, configPathDefinition).then ->
-			return operations.execute(image, configuration.operations, options)
+			majorVersion = resinSemver.major(osVersion)
+
+			configPathDefinition = utils.convertFilePathDefinition(configuration.config)
+			utils.writeConfigJSON(image, config, configPathDefinition)
+			.then ->
+				# Either configure the correct version, or do both if we're not sure.
+				if not majorVersion? || majorVersion == 2
+					network.configureOS2Network(image, manifest, options)
+				if not majorVersion? || majorVersion == 1
+					network.configureOS1Network(image, manifest, options)
+			.then ->
+				return operations.execute(image, configuration.operations, options)
 
 ###*
 # @summary Initialize an image

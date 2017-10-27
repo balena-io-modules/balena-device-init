@@ -19,13 +19,19 @@ limitations under the License.
 /**
  * @module init
  */
-var Promise, operations, utils;
+var Promise, _, network, operations, resinSemver, utils;
+
+_ = require('lodash');
 
 Promise = require('bluebird');
 
 operations = require('resin-device-operations');
 
+resinSemver = require('resin-semver');
+
 utils = require('./utils');
+
+network = require('./network');
 
 
 /**
@@ -34,7 +40,7 @@ utils = require('./utils');
  * @public
  *
  * @description
- * This function injects `config.json` into the device.
+ * This function injects `config.json` and network settings into the device.
  *
  * @param {String} image - path to image
  * @param {String} device type - device type slug
@@ -65,11 +71,25 @@ exports.configure = function(image, deviceType, config, options) {
     options = {};
   }
   return utils.getManifestByDeviceType(image, deviceType).then(function(manifest) {
-    var configPathDefinition, configuration;
-    configuration = manifest.configuration;
-    configPathDefinition = utils.convertFilePathDefinition(configuration.config);
-    return utils.writeConfigJSON(image, config, configPathDefinition).then(function() {
-      return operations.execute(image, configuration.operations, options);
+    return Promise["try"](function() {
+      if (manifest.yocto.image === 'resin-image' && _.includes(['resinos-img', 'resin-sdcard'], manifest.yocto.fstype)) {
+        return utils.getImageOsVersion(image);
+      }
+    }).then(function(osVersion) {
+      var configPathDefinition, configuration, majorVersion;
+      configuration = manifest.configuration;
+      majorVersion = resinSemver.major(osVersion);
+      configPathDefinition = utils.convertFilePathDefinition(configuration.config);
+      return utils.writeConfigJSON(image, config, configPathDefinition).then(function() {
+        if ((majorVersion == null) || majorVersion === 2) {
+          network.configureOS2Network(image, manifest, options);
+        }
+        if ((majorVersion == null) || majorVersion === 1) {
+          return network.configureOS1Network(image, manifest, options);
+        }
+      }).then(function() {
+        return operations.execute(image, configuration.operations, options);
+      });
     });
   });
 };
