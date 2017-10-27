@@ -72,7 +72,8 @@ exports.configure = function(image, deviceType, config, options) {
   }
   return utils.getManifestByDeviceType(image, deviceType).then(function(manifest) {
     return Promise["try"](function() {
-      if (manifest.yocto.image === 'resin-image' && _.includes(['resinos-img', 'resin-sdcard'], manifest.yocto.fstype)) {
+      var ref, ref1;
+      if (((ref = manifest.yocto) != null ? ref.image : void 0) === 'resin-image' && _.includes(['resinos-img', 'resin-sdcard'], (ref1 = manifest.yocto) != null ? ref1.fstype : void 0)) {
         return utils.getImageOsVersion(image);
       }
     }).then(function(osVersion) {

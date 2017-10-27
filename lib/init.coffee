@@ -63,7 +63,7 @@ exports.configure = (image, deviceType, config, options = {}) ->
 			# We only know how to find /etc/os-release on specific types of OS image. In future, we'd like to be able
 			# to do this for any image, but for now we'll just treat others as unknowable (which means below we'll
 			# configure the network to work for _either_ OS version.
-			if manifest.yocto.image == 'resin-image' and _.includes(['resinos-img', 'resin-sdcard'], manifest.yocto.fstype)
+			if manifest.yocto?.image == 'resin-image' and _.includes(['resinos-img', 'resin-sdcard'], manifest.yocto?.fstype)
 				utils.getImageOsVersion(image)
 		.then (osVersion) ->
 			configuration = manifest.configuration
