@@ -19,9 +19,11 @@ limitations under the License.
 /**
  * @module network
  */
-var CONNECTIONS_FOLDER, DEFAULT_CONNECTION_FILE, _, forImage, getConfigPathDefinition, getOS1ConfigurationSchema, getOS1EthernetConfiguration, getOS1WifiConfigurationSchema, getOS2WifiConfigurationSchema, imagefs, prepareImageWifiConfig, reconfix, utils;
+var CONNECTIONS_FOLDER, DEFAULT_CONNECTION_FILE, _, fileNotFoundError, getConfigPathDefinition, getOS1ConfigurationSchema, getOS1EthernetConfiguration, getOS1WifiConfigurationSchema, getOS2WifiConfigurationSchema, imagefs, path, prepareImageOS1NetworkConfig, prepareImageOS2WifiConfig, reconfix, utils;
 
 _ = require('lodash');
+
+path = require('path');
 
 utils = require('./utils');
 
@@ -45,9 +47,8 @@ getConfigPathDefinition = function(manifest, configPath, useNewImageFsFormat) {
   return configPathDefinition;
 };
 
-forImage = function(image, configPathDefinition) {
-  configPathDefinition.image = image;
-  return configPathDefinition;
+fileNotFoundError = function(e) {
+  return e.code === 'ENOENT';
 };
 
 
@@ -67,9 +68,14 @@ forImage = function(image, configPathDefinition) {
  */
 
 exports.configureOS1Network = function(image, manifest, answers) {
-  var schema;
-  schema = getOS1ConfigurationSchema(manifest, answers);
-  return reconfix.writeConfiguration(schema, answers, image);
+  return prepareImageOS1NetworkConfig(image, manifest).then(function() {
+    var schema;
+    schema = getOS1ConfigurationSchema(manifest, answers);
+    if (manifest.configuration.config.image) {
+      image = path.join(image, manifest.configuration.config.image);
+    }
+    return reconfix.writeConfiguration(schema, answers, image);
+  });
 };
 
 
@@ -92,10 +98,34 @@ exports.configureOS2Network = function(image, manifest, answers) {
   if (answers.network !== 'wifi') {
     return;
   }
-  return prepareImageWifiConfig(image, manifest).then(function() {
+  return prepareImageOS2WifiConfig(image, manifest).then(function() {
     var schema;
     schema = getOS2WifiConfigurationSchema(manifest, answers);
+    if (manifest.configuration.config.image) {
+      image = path.join(image, manifest.configuration.config.image);
+    }
     return reconfix.writeConfiguration(schema, answers, image);
+  });
+};
+
+prepareImageOS1NetworkConfig = function(target, manifest) {
+  var configFilePath;
+  configFilePath = utils.definitionForImage(target, utils.convertFilePathDefinition(manifest.configuration.config));
+  return imagefs.readFile(configFilePath).then(JSON.parse).then(function(contents) {
+    var base;
+    if (contents.files == null) {
+      contents.files = {};
+    }
+    if ((base = contents.files)['network/network.config'] == null) {
+      base['network/network.config'] = '';
+    }
+    return imagefs.writeFile(configFilePath, JSON.stringify(contents));
+  })["catch"](fileNotFoundError, function() {
+    return imagefs.writeFile(configFilePath, JSON.stringify({
+      files: {
+        'network/network.config': ''
+      }
+    }));
   });
 };
 
@@ -115,7 +145,7 @@ exports.configureOS2Network = function(image, manifest, answers) {
  * @returns {Promise<void>}
  */
 
-prepareImageWifiConfig = function(target, manifest) {
+prepareImageOS2WifiConfig = function(target, manifest) {
 
   /*
   	 * We need to ensure a template network settings file exists at resin-wifi. To do that:
@@ -125,19 +155,18 @@ prepareImageWifiConfig = function(target, manifest) {
   	 * * otherwise, the new file is created from a hardcoded template
    */
   var connectionsFolderDefinition;
-  connectionsFolderDefinition = forImage(target, getConfigPathDefinition(manifest, CONNECTIONS_FOLDER));
-  console.log(connectionsFolderDefinition);
+  connectionsFolderDefinition = utils.definitionForImage(target, getConfigPathDefinition(manifest, CONNECTIONS_FOLDER));
   return imagefs.listDirectory(connectionsFolderDefinition).then(function(files) {
     if (_.includes(files, 'resin-wifi')) {
       return;
     }
     if (_.includes(files, 'resin-sample.ignore')) {
-      return imagefs.copy(forImage(target, getConfigPathDefinition(manifest, CONNECTIONS_FOLDER + "/resin-sample.ignore")), forImage(target, getConfigPathDefinition(manifest, CONNECTIONS_FOLDER + "/resin-wifi")));
+      return imagefs.copy(utils.definitionForImage(target, getConfigPathDefinition(manifest, CONNECTIONS_FOLDER + "/resin-sample.ignore")), utils.definitionForImage(target, getConfigPathDefinition(manifest, CONNECTIONS_FOLDER + "/resin-wifi")));
     }
     if (_.includes(files, 'resin-sample')) {
-      return imagefs.copy(forImage(target, getConfigPathDefinition(manifest, CONNECTIONS_FOLDER + "/resin-sample")), forImage(target, getConfigPathDefinition(manifest, CONNECTIONS_FOLDER + "/resin-wifi")));
+      return imagefs.copy(utils.definitionForImage(target, getConfigPathDefinition(manifest, CONNECTIONS_FOLDER + "/resin-sample")), utils.definitionForImage(target, getConfigPathDefinition(manifest, CONNECTIONS_FOLDER + "/resin-wifi")));
     }
-    return imagefs.writeFile(forImage(target, getConfigPathDefinition(manifest, CONNECTIONS_FOLDER + "/resin-wifi")), DEFAULT_CONNECTION_FILE);
+    return imagefs.writeFile(utils.definitionForImage(target, getConfigPathDefinition(manifest, CONNECTIONS_FOLDER + "/resin-wifi")), DEFAULT_CONNECTION_FILE);
   });
 };
 

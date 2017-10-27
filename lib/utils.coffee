@@ -80,6 +80,37 @@ exports.convertFilePathDefinition = (inputDefinition) ->
 
 	return definition
 
+
+###*
+# @summary Add image info to a device type config definition
+# @function
+# @protected
+#
+# @param {String} image - image path
+# @param {Object} definition - write definition
+#
+# @returns {Object} a write definition
+#
+# @example
+# utils.definitionForImage 'my/rpi.img',
+# 	partition:
+# 		primary: 4
+# 		logical: 1
+# 	path: '/config.json'
+###
+exports.definitionForImage = (image, configDefinition) ->
+	configDefinition = _.cloneDeep(configDefinition)
+
+	if configDefinition.image?
+		# Sometimes (e.g. edison) our 'image' is a folder of images, and the
+		# config specifies which one within that we should be using
+		configDefinition.image = path.join(image, configDefinition.image)
+	else
+		configDefinition.image = image
+
+	return configDefinition
+
+
 ###*
 # @summary Get image OS version
 # @function
@@ -143,9 +174,6 @@ exports.getImageOsVersion = (image) ->
 exports.writeConfigJSON = (image, config, definition) ->
 	config = JSON.stringify(config)
 
-	if not definition.partition?
-		definition.image = path.join(image, definition.image)
-	else
-		definition.image ?= image
+	definition = exports.definitionForImage(image, definition)
 
 	return imagefs.write(definition, stringToStream(config))

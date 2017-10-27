@@ -91,6 +91,35 @@ exports.convertFilePathDefinition = function(inputDefinition) {
 
 
 /**
+ * @summary Add image info to a device type config definition
+ * @function
+ * @protected
+ *
+ * @param {String} image - image path
+ * @param {Object} definition - write definition
+ *
+ * @returns {Object} a write definition
+ *
+ * @example
+ * utils.definitionForImage 'my/rpi.img',
+ * 	partition:
+ * 		primary: 4
+ * 		logical: 1
+ * 	path: '/config.json'
+ */
+
+exports.definitionForImage = function(image, configDefinition) {
+  configDefinition = _.cloneDeep(configDefinition);
+  if (configDefinition.image != null) {
+    configDefinition.image = path.join(image, configDefinition.image);
+  } else {
+    configDefinition.image = image;
+  }
+  return configDefinition;
+};
+
+
+/**
  * @summary Get image OS version
  * @function
  * @protected
@@ -151,12 +180,6 @@ exports.getImageOsVersion = function(image) {
 
 exports.writeConfigJSON = function(image, config, definition) {
   config = JSON.stringify(config);
-  if (definition.partition == null) {
-    definition.image = path.join(image, definition.image);
-  } else {
-    if (definition.image == null) {
-      definition.image = image;
-    }
-  }
+  definition = exports.definitionForImage(image, definition);
   return imagefs.write(definition, stringToStream(config));
 };

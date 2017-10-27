@@ -19,6 +19,7 @@ limitations under the License.
 ###
 
 _ = require('lodash')
+path = require('path')
 utils = require('./utils')
 imagefs = require('resin-image-fs')
 reconfix = require('reconfix')
@@ -37,9 +38,8 @@ getConfigPathDefinition = (manifest, configPath, useNewImageFsFormat = true) ->
 	configPathDefinition.path = configPath
 	return configPathDefinition
 
-forImage = (image, configPathDefinition) ->
-	configPathDefinition.image = image
-	return configPathDefinition
+fileNotFoundError = (e) ->
+	e.code == 'ENOENT'
 
 ###*
 # @summary Configure network on an ResinOS 1.x image
@@ -56,8 +56,14 @@ forImage = (image, configPathDefinition) ->
 # @returns {Promise<void>}
 ###
 exports.configureOS1Network = (image, manifest, answers) ->
-	schema = getOS1ConfigurationSchema(manifest, answers)
-	reconfix.writeConfiguration(schema, answers, image)
+	prepareImageOS1NetworkConfig(image, manifest)
+	.then ->
+		schema = getOS1ConfigurationSchema(manifest, answers)
+
+		if manifest.configuration.config.image
+			image = path.join(image, manifest.configuration.config.image)
+
+		reconfix.writeConfiguration(schema, answers, image)
 
 ###*
 # @summary Configure network on an ResinOS 2.x image
@@ -79,11 +85,27 @@ exports.configureOS2Network = (image, manifest, answers) ->
 		# For anything else, we don't know what to do
 		return
 
-	prepareImageWifiConfig(image, manifest)
+	prepareImageOS2WifiConfig(image, manifest)
 	.then ->
 		schema = getOS2WifiConfigurationSchema(manifest, answers)
+		if manifest.configuration.config.image
+			image = path.join(image, manifest.configuration.config.image)
 		reconfix.writeConfiguration(schema, answers, image)
 
+prepareImageOS1NetworkConfig = (target, manifest) ->
+	# This is required because reconfix borks if the child files specified are
+	# completely undefined when it tries to read (before writing) the config
+	configFilePath = utils.definitionForImage(target, utils.convertFilePathDefinition(manifest.configuration.config))
+
+	imagefs.readFile(configFilePath)
+	.then(JSON.parse)
+	.then (contents) ->
+		contents.files ?= {}
+		contents.files['network/network.config'] ?= ''
+		imagefs.writeFile(configFilePath, JSON.stringify(contents))
+	.catch fileNotFoundError, ->
+		imagefs.writeFile configFilePath, JSON.stringify
+			files: 'network/network.config': ''
 
 ###*
 # @summary Prepare the image to ensure the wifi reconfix schema is applyable
@@ -99,7 +121,7 @@ exports.configureOS2Network = (image, manifest, answers) ->
 #
 # @returns {Promise<void>}
 ###
-prepareImageWifiConfig = (target, manifest) ->
+prepareImageOS2WifiConfig = (target, manifest) ->
 	###
 	# We need to ensure a template network settings file exists at resin-wifi. To do that:
 	# * if the `resin-wifi` file exists (previously configured image or downloaded from the UI) we're all good
@@ -107,10 +129,10 @@ prepareImageWifiConfig = (target, manifest) ->
 	# * if the `resin-sample.ignore` exists, it's copied to `resin-wifi`
 	# * otherwise, the new file is created from a hardcoded template
 	###
-	connectionsFolderDefinition = forImage(target, getConfigPathDefinition(manifest, CONNECTIONS_FOLDER))
+	connectionsFolderDefinition = utils.definitionForImage(target, getConfigPathDefinition(manifest, CONNECTIONS_FOLDER))
 
-	console.log(connectionsFolderDefinition)
 	imagefs.listDirectory(connectionsFolderDefinition).then (files) ->
+
 		# The required file already exists
 		if _.includes(files, 'resin-wifi')
 			return
@@ -118,20 +140,20 @@ prepareImageWifiConfig = (target, manifest) ->
 		# Fresh image, new format, according to https://github.com/resin-os/meta-resin/pull/770/files
 		if _.includes(files, 'resin-sample.ignore')
 			return imagefs.copy(
-				forImage(target, getConfigPathDefinition(manifest, "#{CONNECTIONS_FOLDER}/resin-sample.ignore")),
-				forImage(target, getConfigPathDefinition(manifest, "#{CONNECTIONS_FOLDER}/resin-wifi"))
+				utils.definitionForImage(target, getConfigPathDefinition(manifest, "#{CONNECTIONS_FOLDER}/resin-sample.ignore")),
+				utils.definitionForImage(target, getConfigPathDefinition(manifest, "#{CONNECTIONS_FOLDER}/resin-wifi"))
 			)
 
 		# Fresh image, old format
 		if _.includes(files, 'resin-sample')
 			return imagefs.copy(
-				forImage(target, getConfigPathDefinition(manifest, "#{CONNECTIONS_FOLDER}/resin-sample")),
-				forImage(target, getConfigPathDefinition(manifest, "#{CONNECTIONS_FOLDER}/resin-wifi"))
+				utils.definitionForImage(target, getConfigPathDefinition(manifest, "#{CONNECTIONS_FOLDER}/resin-sample")),
+				utils.definitionForImage(target, getConfigPathDefinition(manifest, "#{CONNECTIONS_FOLDER}/resin-wifi"))
 			)
 
 		# In case there's no file at all (shouldn't happen normally, but the file might have been removed)
 		return imagefs.writeFile(
-			forImage(target, getConfigPathDefinition(manifest, "#{CONNECTIONS_FOLDER}/resin-wifi")),
+			utils.definitionForImage(target, getConfigPathDefinition(manifest, "#{CONNECTIONS_FOLDER}/resin-wifi")),
 			DEFAULT_CONNECTION_FILE
 		)
 
