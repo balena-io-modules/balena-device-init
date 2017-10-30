@@ -20,9 +20,10 @@ limitations under the License.
 
 _ = require('lodash')
 path = require('path')
-utils = require('./utils')
 imagefs = require('resin-image-fs')
 reconfix = require('reconfix')
+
+utils = require('./utils')
 
 CONNECTIONS_FOLDER = '/system-connections'
 
@@ -98,14 +99,12 @@ prepareImageOS1NetworkConfig = (target, manifest) ->
 	configFilePath = utils.definitionForImage(target, utils.convertFilePathDefinition(manifest.configuration.config))
 
 	imagefs.readFile(configFilePath)
+	.catch(fileNotFoundError, -> '{}')
 	.then(JSON.parse)
 	.then (contents) ->
 		contents.files ?= {}
 		contents.files['network/network.config'] ?= ''
 		imagefs.writeFile(configFilePath, JSON.stringify(contents))
-	.catch fileNotFoundError, ->
-		imagefs.writeFile configFilePath, JSON.stringify
-			files: 'network/network.config': ''
 
 ###*
 # @summary Prepare the image to ensure the wifi reconfix schema is applyable
@@ -131,7 +130,8 @@ prepareImageOS2WifiConfig = (target, manifest) ->
 	###
 	connectionsFolderDefinition = utils.definitionForImage(target, getConfigPathDefinition(manifest, CONNECTIONS_FOLDER))
 
-	imagefs.listDirectory(connectionsFolderDefinition).then (files) ->
+	imagefs.listDirectory(connectionsFolderDefinition)
+	.then (files) ->
 
 		# The required file already exists
 		if _.includes(files, 'resin-wifi')
@@ -140,20 +140,20 @@ prepareImageOS2WifiConfig = (target, manifest) ->
 		# Fresh image, new format, according to https://github.com/resin-os/meta-resin/pull/770/files
 		if _.includes(files, 'resin-sample.ignore')
 			return imagefs.copy(
-				utils.definitionForImage(target, getConfigPathDefinition(manifest, "#{CONNECTIONS_FOLDER}/resin-sample.ignore")),
+				utils.definitionForImage(target, getConfigPathDefinition(manifest, "#{CONNECTIONS_FOLDER}/resin-sample.ignore"))
 				utils.definitionForImage(target, getConfigPathDefinition(manifest, "#{CONNECTIONS_FOLDER}/resin-wifi"))
 			)
 
 		# Fresh image, old format
 		if _.includes(files, 'resin-sample')
 			return imagefs.copy(
-				utils.definitionForImage(target, getConfigPathDefinition(manifest, "#{CONNECTIONS_FOLDER}/resin-sample")),
+				utils.definitionForImage(target, getConfigPathDefinition(manifest, "#{CONNECTIONS_FOLDER}/resin-sample"))
 				utils.definitionForImage(target, getConfigPathDefinition(manifest, "#{CONNECTIONS_FOLDER}/resin-wifi"))
 			)
 
 		# In case there's no file at all (shouldn't happen normally, but the file might have been removed)
 		return imagefs.writeFile(
-			utils.definitionForImage(target, getConfigPathDefinition(manifest, "#{CONNECTIONS_FOLDER}/resin-wifi")),
+			utils.definitionForImage(target, getConfigPathDefinition(manifest, "#{CONNECTIONS_FOLDER}/resin-wifi"))
 			DEFAULT_CONNECTION_FILE
 		)
 
@@ -198,18 +198,18 @@ getOS1EthernetConfiguration = (manifest) ->
 			# `files` here is used just because it's safe - we're about to overwrite it.
 			domain: [
 				[ 'config_json', 'files' ]
-			],
+			]
 			template: {
 				'files': {}
 			}
 		}
 		{
 			domain: [
-				[ 'network_config', 'service_home_ethernet' ],
-			],
+				[ 'network_config', 'service_home_ethernet' ]
+			]
 			template: {
 				'service_home_ethernet': {
-					'Type': 'ethernet',
+					'Type': 'ethernet'
 					'Nameservers': '8.8.8.8,8.8.4.4'
 				}
 			}
@@ -221,38 +221,38 @@ getOS1EthernetConfiguration = (manifest) ->
 			location:
 				getConfigPathDefinition(manifest, '/config.json', false)
 		network_config:
-			type: 'ini',
+			type: 'ini'
 			location:
-				parent: 'config_json',
+				parent: 'config_json'
 				property: [ 'files', 'network/network.config' ]
 
 getOS1WifiConfigurationSchema = (manifest) ->
 	mapper: [
 		{
 			domain: [
-				[ 'config_json', 'wifiSsid' ],
+				[ 'config_json', 'wifiSsid' ]
 				[ 'config_json', 'wifiKey' ]
-			],
+			]
 			template: {
-				'wifiSsid': '{{wifiSsid}}',
+				'wifiSsid': '{{wifiSsid}}'
 				'wifiKey': '{{wifiKey}}'
 			}
 		}
 		{
 			domain: [
-				[ 'network_config', 'service_home_ethernet' ],
+				[ 'network_config', 'service_home_ethernet' ]
 				[ 'network_config', 'service_home_wifi' ]
-			],
+			]
 			template: {
 				'service_home_ethernet': {
-					'Type': 'ethernet',
+					'Type': 'ethernet'
 					'Nameservers': '8.8.8.8,8.8.4.4'
-				},
+				}
 				'service_home_wifi': {
-					'Hidden': true,
-					'Type': 'wifi',
-					'Name': '{{wifiSsid}}',
-					'Passphrase': '{{wifiKey}}',
+					'Hidden': true
+					'Type': 'wifi'
+					'Name': '{{wifiSsid}}'
+					'Passphrase': '{{wifiKey}}'
 					'Nameservers': '8.8.8.8,8.8.4.4'
 				}
 			}
@@ -264,22 +264,22 @@ getOS1WifiConfigurationSchema = (manifest) ->
 			location:
 				getConfigPathDefinition(manifest, '/config.json', false)
 		network_config:
-			type: 'ini',
+			type: 'ini'
 			location:
-				parent: 'config_json',
+				parent: 'config_json'
 				property: [ 'files', 'network/network.config' ]
 
 getOS2WifiConfigurationSchema = (manifest) ->
 	mapper: [
 		{
 			domain: [
-				[ 'system_connections', 'resin-wifi', 'wifi' ],
+				[ 'system_connections', 'resin-wifi', 'wifi' ]
 				[ 'system_connections', 'resin-wifi', 'wifi-security' ]
 			]
 			template: {
 				'wifi': {
 					'ssid': '{{wifiSsid}}'
-				},
+				}
 				'wifi-security': {
 					'psk': '{{wifiKey}}'
 				}

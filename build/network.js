@@ -25,11 +25,11 @@ _ = require('lodash');
 
 path = require('path');
 
-utils = require('./utils');
-
 imagefs = require('resin-image-fs');
 
 reconfix = require('reconfix');
+
+utils = require('./utils');
 
 CONNECTIONS_FOLDER = '/system-connections';
 
@@ -111,7 +111,9 @@ exports.configureOS2Network = function(image, manifest, answers) {
 prepareImageOS1NetworkConfig = function(target, manifest) {
   var configFilePath;
   configFilePath = utils.definitionForImage(target, utils.convertFilePathDefinition(manifest.configuration.config));
-  return imagefs.readFile(configFilePath).then(JSON.parse).then(function(contents) {
+  return imagefs.readFile(configFilePath)["catch"](fileNotFoundError, function() {
+    return '{}';
+  }).then(JSON.parse).then(function(contents) {
     var base;
     if (contents.files == null) {
       contents.files = {};
@@ -120,12 +122,6 @@ prepareImageOS1NetworkConfig = function(target, manifest) {
       base['network/network.config'] = '';
     }
     return imagefs.writeFile(configFilePath, JSON.stringify(contents));
-  })["catch"](fileNotFoundError, function() {
-    return imagefs.writeFile(configFilePath, JSON.stringify({
-      files: {
-        'network/network.config': ''
-      }
-    }));
   });
 };
 
