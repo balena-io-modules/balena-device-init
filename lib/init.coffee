@@ -73,9 +73,11 @@ exports.configure = (image, deviceType, config, options = {}) ->
 			configPathDefinition = utils.convertFilePathDefinition(configuration.config)
 			utils.writeConfigJSON(image, config, configPathDefinition)
 			.then ->
-				# Either configure the correct version, or do both if we're not sure.
+				# Configure for OS2 if it is OS2, or if we're just not sure
 				if not majorVersion? || majorVersion == 2
 					network.configureOS2Network(image, manifest, options)
+			.then ->
+				# Configure for OS1 if it is OS1, or if we're just not sure
 				if not majorVersion? || majorVersion == 1
 					network.configureOS1Network(image, manifest, options)
 			.then ->

@@ -83,8 +83,9 @@ exports.configure = function(image, deviceType, config, options) {
       configPathDefinition = utils.convertFilePathDefinition(configuration.config);
       return utils.writeConfigJSON(image, config, configPathDefinition).then(function() {
         if ((majorVersion == null) || majorVersion === 2) {
-          network.configureOS2Network(image, manifest, options);
+          return network.configureOS2Network(image, manifest, options);
         }
+      }).then(function() {
         if ((majorVersion == null) || majorVersion === 1) {
           return network.configureOS1Network(image, manifest, options);
         }
