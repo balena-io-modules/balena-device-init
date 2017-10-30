@@ -85,6 +85,54 @@ wary.it 'should add a correct config.json to a raspberry pi containing a device-
 	.then (config) ->
 		m.chai.expect(config.isTestConfig).to.equal(true)
 
+wary.it 'should add network correctly to a 1.x raspberry pi',
+	raspberrypi: RASPBERRYPI_OS1
+, (images) ->
+
+	options =
+		network: 'wifi'
+		wifiSsid: 'testWifiSsid'
+		wifiKey: 'testWifiKey'
+
+	resin.models.device.get(DEVICES.raspberrypi.id).then (device) ->
+		init.configure(images.raspberrypi, device.device_type, {}, options)
+	.then(waitStream)
+	.then ->
+		Promise.using imagefs.read(
+			partition: 1
+			path: '/config.json'
+			image: images.raspberrypi
+		), extract
+	.then(JSON.parse)
+	.then (config) ->
+		m.chai.expect(config.wifiSsid).to.equal('testWifiSsid')
+		m.chai.expect(config.wifiKey).to.equal('testWifiKey')
+
+		m.chai.expect(config.files['network/network.config']).to.include('Name=testWifiSsid')
+		m.chai.expect(config.files['network/network.config']).to.include('Passphrase=testWifiKey')
+
+wary.it 'should add network correctly to a 2.x raspberry pi',
+	raspberrypi: RASPBERRYPI_OS2
+, (images) ->
+
+	options =
+		network: 'wifi'
+		wifiSsid: 'testWifiSsid'
+		wifiKey: 'testWifiKey'
+
+	resin.models.device.get(DEVICES.raspberrypi.id).then (device) ->
+		init.configure(images.raspberrypi, device.device_type, {}, options)
+	.then(waitStream)
+	.then ->
+		Promise.using imagefs.read(
+			partition: 1
+			path: '/system-connections/resin-wifi'
+			image: images.raspberrypi
+		), extract
+	.then (wifiConfig) ->
+		m.chai.expect(wifiConfig).to.include('ssid=testWifiSsid')
+		m.chai.expect(wifiConfig).to.include('psk=testWifiKey')
+
 wary.it 'should not trigger a state event when configuring a raspberry pi',
 	raspberrypi: RASPBERRYPI_OS1
 , (images) ->
