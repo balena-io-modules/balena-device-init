@@ -19,7 +19,6 @@ _ = require('lodash')
 rindle = Promise.promisifyAll(require('rindle'))
 path = require('path')
 stringToStream = require('string-to-stream')
-streamToString = require('stream-to-string')
 imagefs = require('resin-image-fs')
 resin = require('resin-sdk-preconfigured')
 
@@ -128,7 +127,7 @@ exports.getImageOsVersion = (image) ->
 		image: image
 		partition: 2
 		path: '/etc/os-release'
-	), streamToString
+	), rindle.extractAsync
 	.then (osReleaseString) ->
 		parsedOsRelease = _(osReleaseString)
 			.split('\n')

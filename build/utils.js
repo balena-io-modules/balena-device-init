@@ -15,7 +15,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-var Promise, _, imagefs, path, resin, rindle, streamToString, stringToStream;
+var Promise, _, imagefs, path, resin, rindle, stringToStream;
 
 Promise = require('bluebird');
 
@@ -26,8 +26,6 @@ rindle = Promise.promisifyAll(require('rindle'));
 path = require('path');
 
 stringToStream = require('string-to-stream');
-
-streamToString = require('stream-to-string');
 
 imagefs = require('resin-image-fs');
 
@@ -137,7 +135,7 @@ exports.getImageOsVersion = function(image) {
     image: image,
     partition: 2,
     path: '/etc/os-release'
-  }), streamToString).then(function(osReleaseString) {
+  }), rindle.extractAsync).then(function(osReleaseString) {
     var parsedOsRelease;
     parsedOsRelease = _(osReleaseString).split('\n').map(function(line) {
       var match;
