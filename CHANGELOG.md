@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## v4.0.1 - 2017-11-21
+
+- Move from travis to circle and set up npm autopublishing
+
 ## v4.0.0 - 2017-10-13
 
 ### Changed
