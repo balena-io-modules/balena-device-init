@@ -123,7 +123,7 @@ exports.definitionForImage = (image, configDefinition) ->
 # 	console.log(version)
 ###
 exports.getImageOsVersion = (image) ->
-	Promise.resolve imagefs.readFile
+	imagefs.readFile
 		image: image
 		partition: 2
 		path: '/etc/os-release'

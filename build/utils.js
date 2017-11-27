@@ -131,11 +131,11 @@ exports.definitionForImage = function(image, configDefinition) {
  */
 
 exports.getImageOsVersion = function(image) {
-  return Promise.resolve(imagefs.readFile({
+  return imagefs.readFile({
     image: image,
     partition: 2,
     path: '/etc/os-release'
-  })).then(function(osReleaseString) {
+  }).then(function(osReleaseString) {
     var parsedOsRelease;
     parsedOsRelease = _(osReleaseString).split('\n').map(function(line) {
       var match;
