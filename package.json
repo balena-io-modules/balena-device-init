@@ -49,6 +49,7 @@
     "resin-sdk-preconfigured": "^6.0.0",
     "resin-semver": "^1.2.1",
     "rindle": "^1.3.0",
-    "string-to-stream": "^1.0.1"
+    "string-to-stream": "^1.0.1",
+    "ts-node": "^3.3.0"
   }
 }
