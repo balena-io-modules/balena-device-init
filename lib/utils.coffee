@@ -123,11 +123,10 @@ exports.definitionForImage = (image, configDefinition) ->
 # 	console.log(version)
 ###
 exports.getImageOsVersion = (image) ->
-	Promise.using imagefs.read(
+	Promise.resolve imagefs.readFile
 		image: image
 		partition: 2
 		path: '/etc/os-release'
-	), rindle.extractAsync
 	.then (osReleaseString) ->
 		parsedOsRelease = _(osReleaseString)
 			.split('\n')
