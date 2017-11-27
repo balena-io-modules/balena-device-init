@@ -9,8 +9,12 @@ resin = require('resin-sdk-preconfigured')
 imagefs = require('resin-image-fs')
 init = require('../lib/init')
 
-RASPBERRYPI_OS1 = path.join(__dirname, 'images', 'raspberrypi-os1.img')
-RASPBERRYPI_OS2 = path.join(__dirname, 'images', 'raspberrypi-os2.img')
+# TODO: Write tests using the new image types here to check they work
+RASPBERRYPI_OS1 = path.join(__dirname, 'images', 'raspberrypi3-1.26.0.img')
+RASPBERRYPI_OS2 = path.join(__dirname, 'images', 'raspberrypi3-2.3.0+rev1.prod.img')
+RASPBERRYPI_HOSTAPPS = path.join(__dirname, 'images', 'raspberrypi3-2.7.5+rev1.prod.img')
+JETSON_TX2 = path.join(__dirname, 'images', 'jetson-tx2-2.7.5+rev1.prod.img')
+# TODO: Find a published version without a device type
 RASPBERRYPI_WITH_DEVICE_TYPE = path.join(__dirname, 'images', 'raspberrypi-with-device-type.img')
 EDISON = path.join(__dirname, 'images', 'edison')
 RANDOM = path.join(__dirname, 'images', 'device.random')

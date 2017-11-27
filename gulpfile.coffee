@@ -9,20 +9,13 @@ OPTIONS =
 	config:
 		coffeelint: path.join(__dirname, 'coffeelint.json')
 	files:
-		coffee: [ 'lib/**/*.coffee', 'tests/**/*.spec.coffee', 'gulpfile.coffee' ]
+		coffee: [ 'lib/**/*.coffee', 'gulpfile.coffee' ]
 		app: 'lib/**/*.coffee'
-		tests: 'tests/**/*.spec.coffee'
 
 gulp.task 'coffee', ->
 	gulp.src(OPTIONS.files.app)
 		.pipe(coffee(bare: true, header: true)).on('error', gutil.log)
 		.pipe(gulp.dest('build/'))
-
-gulp.task 'test', ->
-	gulp.src(OPTIONS.files.tests, read: false)
-		.pipe(mocha({
-			reporter: 'min'
-		}))
 
 gulp.task 'lint', ->
 	gulp.src(OPTIONS.files.coffee)

@@ -21,7 +21,8 @@
   "scripts": {
     "build": "gulp build && npm run readme",
     "pretest": "npm run build",
-    "test": "gulp test && coffee tests/e2e.coffee",
+    "test": "ts-node tests/update-images.ts && coffee tests/e2e.coffee",
+    "refresh-images": "rm tests/images/*.img && ts-node tests/update-images.ts",
     "prepublish": "npm run build",
     "readme": "jsdoc2md --template doc/README.hbs build/init.js > README.md"
   },
