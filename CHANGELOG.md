@@ -5,6 +5,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## v4.0.1 - 2017-11-21
 
+## v4.1.0 - 2017-11-28
+
+* Upgrade to reconfix 0.0.4 to fix windows support [Tim Perry]
+* Make .configure() configure network settings for both 1.x & 2.x [Tim Perry]
+* Upgrade to resin-image-fs@4, adding ext support [Tim Perry]
+
 - Move from travis to circle and set up npm autopublishing
 
 ## v4.0.0 - 2017-10-13
