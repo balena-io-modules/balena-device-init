@@ -36,7 +36,7 @@ Documentation
 <a name="module_init.configure"></a>
 
 ### init.configure(image, device, config, [options]) ⇒ <code>Promise.&lt;EventEmitter&gt;</code>
-This function injects `config.json` into the device.
+This function injects `config.json` and network settings into the device.
 
 **Kind**: static method of <code>[init](#module_init)</code>  
 **Summary**: Configure an image with an application  

@@ -9,7 +9,8 @@ resin = require('resin-sdk-preconfigured')
 imagefs = require('resin-image-fs')
 init = require('../lib/init')
 
-RASPBERRYPI = path.join(__dirname, 'images', 'raspberrypi.img')
+RASPBERRYPI_OS1 = path.join(__dirname, 'images', 'raspberrypi-os1.img')
+RASPBERRYPI_OS2 = path.join(__dirname, 'images', 'raspberrypi-os2.img')
 RASPBERRYPI_WITH_DEVICE_TYPE = path.join(__dirname, 'images', 'raspberrypi-with-device-type.img')
 EDISON = path.join(__dirname, 'images', 'edison')
 RANDOM = path.join(__dirname, 'images', 'device.random')
@@ -45,7 +46,7 @@ waitStream = (stream) ->
 ########################################################################
 
 wary.it 'should add a config.json correctly to a raspberry pi',
-	raspberrypi: RASPBERRYPI
+	raspberrypi: RASPBERRYPI_OS1
 , (images) ->
 
 	config =
@@ -54,12 +55,12 @@ wary.it 'should add a config.json correctly to a raspberry pi',
 	resin.models.device.get(DEVICES.raspberrypi.id).then (device) ->
 		init.configure(images.raspberrypi, device.device_type, config)
 	.then(waitStream)
-	.then _.partial imagefs.read,
-		partition:
-			primary: 1
-		path: '/config.json'
-		image: images.raspberrypi
-	.then(extract)
+	.then ->
+		Promise.using imagefs.read(
+			partition: 1
+			path: '/config.json'
+			image: images.raspberrypi
+		), extract
 	.then(JSON.parse)
 	.then (config) ->
 		m.chai.expect(config.isTestConfig).to.equal(true)
@@ -74,19 +75,66 @@ wary.it 'should add a correct config.json to a raspberry pi containing a device-
 	resin.models.device.get(DEVICES.raspberrypi.id).then (device) ->
 		init.configure(images.raspberrypi, device.device_type, config)
 	.then(waitStream)
-	.then _.partial imagefs.read,
-		partition:
-			primary: 4
-			logical: 1
-		path: '/config.json'
-		image: images.raspberrypi
-	.then(extract)
+	.then ->
+		Promise.using imagefs.read(
+			partition: 5
+			path: '/config.json'
+			image: images.raspberrypi
+		), extract
 	.then(JSON.parse)
 	.then (config) ->
 		m.chai.expect(config.isTestConfig).to.equal(true)
 
+wary.it 'should add network correctly to a 1.x raspberry pi',
+	raspberrypi: RASPBERRYPI_OS1
+, (images) ->
+
+	options =
+		network: 'wifi'
+		wifiSsid: 'testWifiSsid'
+		wifiKey: 'testWifiKey'
+
+	resin.models.device.get(DEVICES.raspberrypi.id).then (device) ->
+		init.configure(images.raspberrypi, device.device_type, {}, options)
+	.then(waitStream)
+	.then ->
+		Promise.using imagefs.read(
+			partition: 1
+			path: '/config.json'
+			image: images.raspberrypi
+		), extract
+	.then(JSON.parse)
+	.then (config) ->
+		m.chai.expect(config.wifiSsid).to.equal('testWifiSsid')
+		m.chai.expect(config.wifiKey).to.equal('testWifiKey')
+
+		m.chai.expect(config.files['network/network.config']).to.include('Name=testWifiSsid')
+		m.chai.expect(config.files['network/network.config']).to.include('Passphrase=testWifiKey')
+
+wary.it 'should add network correctly to a 2.x raspberry pi',
+	raspberrypi: RASPBERRYPI_OS2
+, (images) ->
+
+	options =
+		network: 'wifi'
+		wifiSsid: 'testWifiSsid'
+		wifiKey: 'testWifiKey'
+
+	resin.models.device.get(DEVICES.raspberrypi.id).then (device) ->
+		init.configure(images.raspberrypi, device.device_type, {}, options)
+	.then(waitStream)
+	.then ->
+		Promise.using imagefs.read(
+			partition: 1
+			path: '/system-connections/resin-wifi'
+			image: images.raspberrypi
+		), extract
+	.then (wifiConfig) ->
+		m.chai.expect(wifiConfig).to.include('ssid=testWifiSsid')
+		m.chai.expect(wifiConfig).to.include('psk=testWifiKey')
+
 wary.it 'should not trigger a state event when configuring a raspberry pi',
-	raspberrypi: RASPBERRYPI
+	raspberrypi: RASPBERRYPI_OS1
 , (images) ->
 	spy = m.sinon.spy()
 
@@ -99,7 +147,7 @@ wary.it 'should not trigger a state event when configuring a raspberry pi',
 		m.chai.expect(spy).to.not.have.been.called
 
 wary.it 'should initialize a raspberry pi image',
-	raspberrypi: RASPBERRYPI
+	raspberrypi: RASPBERRYPI_OS1
 	random: RANDOM
 , (images) ->
 
@@ -143,7 +191,7 @@ wary.it 'should initialize a raspberry pi image containing a device type',
 			m.chai.expect(results.random).to.deep.equal(results.raspberrypi)
 
 wary.it 'should emit state events when initializing a raspberry pi',
-	raspberrypi: RASPBERRYPI
+	raspberrypi: RASPBERRYPI_OS1
 	random: RANDOM
 , (images) ->
 
@@ -167,7 +215,7 @@ wary.it 'should emit state events when initializing a raspberry pi',
 		m.chai.expect(args[0].percentage).to.equal(100)
 
 wary.it 'should emit burn events when initializing a raspberry pi',
-	raspberrypi: RASPBERRYPI
+	raspberrypi: RASPBERRYPI_OS1
 	random: RANDOM
 , (images) ->
 
@@ -204,10 +252,11 @@ wary.it 'should add a config.json to an intel edison',
 	resin.models.device.get(DEVICES.edison.id).then (device) ->
 		init.configure(images.edison, device.device_type, config)
 	.then(waitStream)
-	.then _.partial imagefs.read,
-		image: path.join(images.edison, 'resin-image-edison.hddimg')
-		path: '/config.json'
-	.then(extract)
+	.then ->
+		Promise.using imagefs.read(
+			path: '/config.json'
+			image: path.join(images.edison, 'resin-image-edison.hddimg')
+		), extract
 	.then(JSON.parse)
 	.then (config) ->
 		m.chai.expect(config.isTestConfig).to.equal(true)
