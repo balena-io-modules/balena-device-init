@@ -33,16 +33,9 @@ utils = require('./utils');
 
 CONNECTIONS_FOLDER = '/system-connections';
 
-getConfigPathDefinition = function(manifest, configPath, useNewImageFsFormat) {
+getConfigPathDefinition = function(manifest, configPath) {
   var configPathDefinition;
-  if (useNewImageFsFormat == null) {
-    useNewImageFsFormat = true;
-  }
-  if (useNewImageFsFormat) {
-    configPathDefinition = utils.convertFilePathDefinition(manifest.configuration.config);
-  } else {
-    configPathDefinition = _.clone(manifest.configuration.config);
-  }
+  configPathDefinition = utils.convertFilePathDefinition(manifest.configuration.config);
   configPathDefinition.path = configPath;
   return configPathDefinition;
 };
@@ -197,7 +190,7 @@ getOS1EthernetConfiguration = function(manifest) {
     files: {
       config_json: {
         type: 'json',
-        location: getConfigPathDefinition(manifest, '/config.json', false)
+        location: getConfigPathDefinition(manifest, '/config.json')
       },
       network_config: {
         type: 'ini',
@@ -239,7 +232,7 @@ getOS1WifiConfigurationSchema = function(manifest) {
     files: {
       config_json: {
         type: 'json',
-        location: getConfigPathDefinition(manifest, '/config.json', false)
+        location: getConfigPathDefinition(manifest, '/config.json')
       },
       network_config: {
         type: 'ini',
@@ -271,7 +264,7 @@ getOS2WifiConfigurationSchema = function(manifest) {
       system_connections: {
         fileset: true,
         type: 'ini',
-        location: getConfigPathDefinition(manifest, CONNECTIONS_FOLDER, false)
+        location: getConfigPathDefinition(manifest, CONNECTIONS_FOLDER)
       }
     }
   };
