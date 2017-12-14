@@ -27,13 +27,8 @@ utils = require('./utils')
 
 CONNECTIONS_FOLDER = '/system-connections'
 
-getConfigPathDefinition = (manifest, configPath, useNewImageFsFormat = true) ->
-	# Reconfix is still using the old imagefs, so needs the old format
-	# The flag is a bit hacky, but JS reconfix (and this code) should be replaced soon anyway
-	if useNewImageFsFormat
-		configPathDefinition = utils.convertFilePathDefinition(manifest.configuration.config)
-	else
-		configPathDefinition = _.clone(manifest.configuration.config)
+getConfigPathDefinition = (manifest, configPath) ->
+	configPathDefinition = utils.convertFilePathDefinition(manifest.configuration.config)
 
 	# Config locations are assumed to be the same as config.json, except the path itself
 	configPathDefinition.path = configPath
@@ -219,7 +214,7 @@ getOS1EthernetConfiguration = (manifest) ->
 		config_json:
 			type: 'json'
 			location:
-				getConfigPathDefinition(manifest, '/config.json', false)
+				getConfigPathDefinition(manifest, '/config.json')
 		network_config:
 			type: 'ini'
 			location:
@@ -262,7 +257,7 @@ getOS1WifiConfigurationSchema = (manifest) ->
 		config_json:
 			type: 'json'
 			location:
-				getConfigPathDefinition(manifest, '/config.json', false)
+				getConfigPathDefinition(manifest, '/config.json')
 		network_config:
 			type: 'ini'
 			location:
@@ -291,4 +286,4 @@ getOS2WifiConfigurationSchema = (manifest) ->
 			fileset: true
 			type: 'ini'
 			location:
-				getConfigPathDefinition(manifest, CONNECTIONS_FOLDER, false)
+				getConfigPathDefinition(manifest, CONNECTIONS_FOLDER)
