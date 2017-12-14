@@ -1,6 +1,6 @@
 {
   "name": "resin-device-init",
-  "version": "4.1.0",
+  "version": "4.2.0",
   "description": "Configure and initialize devices using device specs",
   "main": "build/init.js",
   "homepage": "https://github.com/resin-io/resin-device-init",
