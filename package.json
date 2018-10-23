@@ -47,7 +47,7 @@
     "resin-device-operations": "^1.4.1",
     "resin-image-fs": "^5.0.4",
     "resin-sdk-preconfigured": "^6.0.0",
-    "resin-semver": "^1.3.0",
+    "resin-semver": "^1.4.0",
     "rindle": "^1.3.0",
     "string-to-stream": "^1.0.1"
   }
