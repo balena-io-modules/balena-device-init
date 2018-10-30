@@ -1,28 +1,26 @@
-resin-device-init
+balena-device-init
 -----------------
 
-[![npm version](https://badge.fury.io/js/resin-device-init.svg)](http://badge.fury.io/js/resin-device-init)
-[![dependencies](https://david-dm.org/resin-io/resin-device-init.png)](https://david-dm.org/resin-io/resin-device-init.png)
-[![Build Status](https://travis-ci.org/resin-io/resin-device-init.svg?branch=master)](https://travis-ci.org/resin-io/resin-device-init)
-
-Join our online chat at [![Gitter chat](https://badges.gitter.im/resin-io/chat.png)](https://gitter.im/resin-io/chat)
+[![npm version](https://badge.fury.io/js/balena-device-init.svg)](http://badge.fury.io/js/balena-device-init)
+[![dependencies](https://david-dm.org/balena-io/balena-device-init.png)](https://david-dm.org/balena-io/balena-device-init.png)
+[![Build Status](https://travis-ci.org/balena-io/balena-device-init.svg?branch=master)](https://travis-ci.org/balena-io/balena-device-init)
 
 Configure and initialize devices using device specs.
 
 Role
 ----
 
-The intention of this module is to provide low level access to how Resin.io configures and initialises devices using device specs.
+The intention of this module is to provide low level access to how balena configures and initialises devices using device specs.
 
 **THIS MODULE IS LOW LEVEL AND IS NOT MEANT TO BE USED BY END USERS DIRECTLY**.
 
 Installation
 ------------
 
-Install `resin-device-init` by running:
+Install `balena-device-init` by running:
 
 ```sh
-$ npm install --save resin-device-init
+$ npm install --save balena-device-init
 ```
 
 Documentation
@@ -105,17 +103,17 @@ init.initialize('my/rpi.img', 'raspberry-pi', network: 'ethernet').then (configu
 Support
 -------
 
-If you're having any problem, please [raise an issue](https://github.com/resin-io/resin-device-init/issues/new) on GitHub and the Resin.io team will be happy to help.
+If you're having any problem, please [raise an issue](https://github.com/balena-io/balena-device-init/issues/new) on GitHub and the balena team will be happy to help.
 
 Tests
 -----
 
 Create an `.env` file and put the following lines in it, replacing the asterisks
-with the valid credentials for a test user on [resinstaging.io](https://resinstaging.io)
+with the valid credentials for a test user on [balena-staging.com](https://balena-staging.com)
 
 ```
-RESIN_E2E_EMAIL=***
-RESIN_E2E_PASSWORD=***
+TEST_EMAIL=***
+TEST_PASSWORD=***
 ```
 
 Run the test suite by doing:
@@ -127,8 +125,8 @@ $ npm test
 Contribute
 ----------
 
-- Issue Tracker: [github.com/resin-io/resin-device-init/issues](https://github.com/resin-io/resin-device-init/issues)
-- Source Code: [github.com/resin-io/resin-device-init](https://github.com/resin-io/resin-device-init)
+- Issue Tracker: [github.com/balena-io/balena-device-init/issues](https://github.com/balena-io/balena-device-init/issues)
+- Source Code: [github.com/balena-io/balena-device-init](https://github.com/balena-io/balena-device-init)
 
 Before submitting a PR, please make sure that you include tests, and that [coffeelint](http://www.coffeelint.org/) runs without any warning:
 
