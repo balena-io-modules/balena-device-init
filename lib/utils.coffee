@@ -20,7 +20,7 @@ rindle = Promise.promisifyAll(require('rindle'))
 path = require('path')
 stringToStream = require('string-to-stream')
 imagefs = require('resin-image-fs')
-resin = require('resin-sdk-preconfigured')
+sdk = require('balena-sdk').fromSharedOptions()
 
 ###*
 # @summary Get device type manifest by a device type name
@@ -47,7 +47,7 @@ exports.getManifestByDeviceType = (image, deviceType) ->
 	), rindle.extractAsync
 	.then(JSON.parse)
 	.catch ->
-		resin.models.device.getManifestBySlug(deviceType)
+		sdk.models.device.getManifestBySlug(deviceType)
 
 ###*
 # @summary Convert a device type file definition to resin-image-fs v4 format
@@ -143,7 +143,7 @@ exports.getImageOsVersion = (image) ->
 			.fromPairs()
 			.value()
 
-		if parsedOsRelease.NAME != 'Resin OS'
+		if parsedOsRelease.NAME != 'Resin OS' and parsedOsRelease.NAME != 'balenaOS'
 			return null
 		else
 			return parsedOsRelease.VERSION || null

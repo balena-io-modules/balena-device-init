@@ -15,7 +15,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-var Promise, _, imagefs, path, resin, rindle, stringToStream;
+var Promise, _, imagefs, path, rindle, sdk, stringToStream;
 
 Promise = require('bluebird');
 
@@ -29,7 +29,7 @@ stringToStream = require('string-to-stream');
 
 imagefs = require('resin-image-fs');
 
-resin = require('resin-sdk-preconfigured');
+sdk = require('balena-sdk').fromSharedOptions();
 
 
 /**
@@ -52,7 +52,7 @@ exports.getManifestByDeviceType = function(image, deviceType) {
     partition: 1,
     path: '/device-type.json'
   }), rindle.extractAsync).then(JSON.parse)["catch"](function() {
-    return resin.models.device.getManifestBySlug(deviceType);
+    return sdk.models.device.getManifestBySlug(deviceType);
   });
 };
 
@@ -146,7 +146,7 @@ exports.getImageOsVersion = function(image) {
         return false;
       }
     }).filter().fromPairs().value();
-    if (parsedOsRelease.NAME !== 'Resin OS') {
+    if (parsedOsRelease.NAME !== 'Resin OS' && parsedOsRelease.NAME !== 'balenaOS') {
       return null;
     } else {
       return parsedOsRelease.VERSION || null;

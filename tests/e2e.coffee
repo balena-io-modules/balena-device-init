@@ -5,7 +5,12 @@ path = require('path')
 Promise = require('bluebird')
 fs = Promise.promisifyAll(require('fs'))
 wary = require('wary')
-resin = require('resin-sdk-preconfigured')
+
+settings = require('balena-settings-client')
+sdk = require('balena-sdk')({
+	apiUrl: settings.get('apiUrl')
+})
+
 imagefs = require('resin-image-fs')
 init = require('../lib/init')
 
@@ -19,12 +24,15 @@ DEVICES = {}
 prepareDevice = (deviceType) ->
 	applicationName = "DeviceInitE2E_#{deviceType.replace(/[- ]/, '_')}"
 	console.log("Creating #{applicationName}")
-	resin.models.application.has(applicationName).then (hasApplication) ->
+	sdk.models.application.has(applicationName).then (hasApplication) ->
 		return if hasApplication
-		resin.models.application.create(applicationName, deviceType)
-	.then(resin.models.device.generateUniqueKey)
+		sdk.models.application.create({
+			name: applicationName
+			deviceType
+		})
+	.then(sdk.models.device.generateUniqueKey)
 	.then (uuid) ->
-		resin.models.device.register(applicationName, uuid)
+		sdk.models.device.register(applicationName, uuid)
 
 extract = (stream) ->
 	return new Promise (resolve, reject) ->
@@ -52,7 +60,7 @@ wary.it 'should add a config.json correctly to a raspberry pi',
 	config =
 		isTestConfig: true
 
-	resin.models.device.get(DEVICES.raspberrypi.id).then (device) ->
+	sdk.models.device.get(DEVICES.raspberrypi.id).then (device) ->
 		init.configure(images.raspberrypi, device.device_type, config)
 	.then(waitStream)
 	.then ->
@@ -72,7 +80,7 @@ wary.it 'should add a correct config.json to a raspberry pi containing a device-
 	config =
 		isTestConfig: true
 
-	resin.models.device.get(DEVICES.raspberrypi.id).then (device) ->
+	sdk.models.device.get(DEVICES.raspberrypi.id).then (device) ->
 		init.configure(images.raspberrypi, device.device_type, config)
 	.then(waitStream)
 	.then ->
@@ -94,7 +102,7 @@ wary.it 'should add network correctly to a 1.x raspberry pi',
 		wifiSsid: 'testWifiSsid'
 		wifiKey: 'testWifiKey'
 
-	resin.models.device.get(DEVICES.raspberrypi.id).then (device) ->
+	sdk.models.device.get(DEVICES.raspberrypi.id).then (device) ->
 		init.configure(images.raspberrypi, device.device_type, {}, options)
 	.then(waitStream)
 	.then ->
@@ -120,7 +128,7 @@ wary.it 'should add network correctly to a 2.x raspberry pi',
 		wifiSsid: 'testWifiSsid'
 		wifiKey: 'testWifiKey'
 
-	resin.models.device.get(DEVICES.raspberrypi.id).then (device) ->
+	sdk.models.device.get(DEVICES.raspberrypi.id).then (device) ->
 		init.configure(images.raspberrypi, device.device_type, {}, options)
 	.then(waitStream)
 	.then ->
@@ -138,7 +146,7 @@ wary.it 'should not trigger a state event when configuring a raspberry pi',
 , (images) ->
 	spy = m.sinon.spy()
 
-	resin.models.device.get(DEVICES.raspberrypi.id).then (device) ->
+	sdk.models.device.get(DEVICES.raspberrypi.id).then (device) ->
 		init.configure(images.raspberrypi, device.device_type, {})
 	.then (configuration) ->
 		configuration.on('state', spy)
@@ -155,7 +163,7 @@ wary.it 'should initialize a raspberry pi image',
 		raw: images.random
 		size: fs.statSync(images.random).size
 
-	resin.models.device.get(DEVICES.raspberrypi.id).then (device) ->
+	sdk.models.device.get(DEVICES.raspberrypi.id).then (device) ->
 		init.configure(images.raspberrypi, device.device_type, {})
 	.then(waitStream).then ->
 		init.initialize(images.raspberrypi, 'raspberry-pi', { drive })
@@ -175,7 +183,7 @@ wary.it 'should initialize a raspberry pi image containing a device type',
 		raw: images.random
 		size: fs.statSync(images.random).size
 
-	resin.models.device.get(DEVICES.raspberrypi.id).then (device) ->
+	sdk.models.device.get(DEVICES.raspberrypi.id).then (device) ->
 		init.configure(images.raspberrypi, device.device_type, {})
 	.then(waitStream).then ->
 
@@ -201,7 +209,7 @@ wary.it 'should emit state events when initializing a raspberry pi',
 
 	spy = m.sinon.spy()
 
-	resin.models.device.get(DEVICES.raspberrypi.id).then (device) ->
+	sdk.models.device.get(DEVICES.raspberrypi.id).then (device) ->
 		init.configure(images.raspberrypi, device.device_type, {})
 	.then(waitStream).then ->
 		init.initialize(images.raspberrypi, 'raspberry-pi', { drive })
@@ -225,7 +233,7 @@ wary.it 'should emit burn events when initializing a raspberry pi',
 
 	spy = m.sinon.spy()
 
-	resin.models.device.get(DEVICES.raspberrypi.id).then (device) ->
+	sdk.models.device.get(DEVICES.raspberrypi.id).then (device) ->
 		init.configure(images.raspberrypi, device.device_type, {})
 	.then(waitStream).then ->
 		init.initialize(images.raspberrypi, 'raspberry-pi', { drive })
@@ -249,7 +257,7 @@ wary.it 'should add a config.json to an intel edison',
 	config =
 		isTestConfig: true
 
-	resin.models.device.get(DEVICES.edison.id).then (device) ->
+	sdk.models.device.get(DEVICES.edison.id).then (device) ->
 		init.configure(images.edison, device.device_type, config)
 	.then(waitStream)
 	.then ->
@@ -267,7 +275,7 @@ wary.it 'should not trigger a state event when configuring an intel edison',
 
 	spy = m.sinon.spy()
 
-	resin.models.device.get(DEVICES.edison.id).then (device) ->
+	sdk.models.device.get(DEVICES.edison.id).then (device) ->
 		init.configure(images.edison, device.device_type, {})
 	.then (configuration) ->
 		configuration.on('state', spy)
@@ -282,7 +290,7 @@ wary.it 'should be able to initialize an intel edison with a script',
 	stdout = ''
 	stderr = ''
 
-	resin.models.device.get(DEVICES.edison.id).then (device) ->
+	sdk.models.device.get(DEVICES.edison.id).then (device) ->
 		init.configure(images.edison, device.device_type, {})
 	.then(waitStream)
 	.then ->
@@ -303,7 +311,7 @@ wary.it 'should be able to initialize an intel edison with a script',
 Promise.try ->
 	require('dotenv').config(silent: true)
 .then ->
-	resin.auth.login
+	sdk.auth.login
 		email: process.env.RESIN_E2E_EMAIL
 		password: process.env.RESIN_E2E_PASSWORD
 .then ->
