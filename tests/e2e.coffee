@@ -312,8 +312,8 @@ Promise.try ->
 	require('dotenv').config(silent: true)
 .then ->
 	sdk.auth.login
-		email: process.env.RESIN_E2E_EMAIL
-		password: process.env.RESIN_E2E_PASSWORD
+		email: process.env.TEST_EMAIL
+		password: process.env.TEST_PASSWORD
 .then ->
 	console.log('Logged in')
 	Promise.props
