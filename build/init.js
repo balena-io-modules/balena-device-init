@@ -33,6 +33,10 @@ utils = require('./utils');
 
 network = require('./network');
 
+exports.getImageManifest = utils.getImageManifest;
+
+exports.getImageOsVersion = utils.getImageOsVersion;
+
 
 /**
  * @summary Configure an image with an application
@@ -40,17 +44,17 @@ network = require('./network');
  * @public
  *
  * @description
- * This function injects `config.json` and network settings into the device.
+ * This function injects `config.json` and network settings into the image.
  *
  * @param {String} image - path to image
- * @param {String} device type - device type slug
+ * @param {Object} manifest - device type manifest
  * @param {Object} config - a fully populated config object
  * @param {Object} [options] - configuration options
  *
  * @returns {Promise<EventEmitter>} configuration event emitter
  *
  * @example
- * init.configure('my/rpi.img', 'raspberrypi', config).then (configuration) ->
+ * init.configure('my/rpi.img', manifest, config).then (configuration) ->
  *
  * 	configuration.on('stdout', process.stdout.write)
  * 	configuration.on('stderr', process.stderr.write)
@@ -66,32 +70,30 @@ network = require('./network');
  * 		console.log('Configuration finished')
  */
 
-exports.configure = function(image, deviceType, config, options) {
+exports.configure = function(image, manifest, config, options) {
   if (options == null) {
     options = {};
   }
-  return utils.getManifestByDeviceType(image, deviceType).then(function(manifest) {
-    return Promise["try"](function() {
-      var ref, ref1;
-      if (((ref = manifest.yocto) != null ? ref.image : void 0) === 'resin-image' && _.includes(['resinos-img', 'resin-sdcard'], (ref1 = manifest.yocto) != null ? ref1.fstype : void 0)) {
-        return utils.getImageOsVersion(image);
+  return Promise["try"](function() {
+    var ref, ref1;
+    if (((ref = manifest.yocto) != null ? ref.image : void 0) === 'resin-image' && _.includes(['resinos-img', 'resin-sdcard'], (ref1 = manifest.yocto) != null ? ref1.fstype : void 0)) {
+      return utils.getImageOsVersion(image, manifest);
+    }
+  }).then(function(osVersion) {
+    var configPathDefinition, configuration, majorVersion;
+    configuration = manifest.configuration;
+    majorVersion = resinSemver.major(osVersion);
+    configPathDefinition = utils.convertFilePathDefinition(configuration.config);
+    return utils.writeConfigJSON(image, config, configPathDefinition).then(function() {
+      if ((majorVersion == null) || majorVersion === 2) {
+        return network.configureOS2Network(image, manifest, options);
       }
-    }).then(function(osVersion) {
-      var configPathDefinition, configuration, majorVersion;
-      configuration = manifest.configuration;
-      majorVersion = resinSemver.major(osVersion);
-      configPathDefinition = utils.convertFilePathDefinition(configuration.config);
-      return utils.writeConfigJSON(image, config, configPathDefinition).then(function() {
-        if ((majorVersion == null) || majorVersion === 2) {
-          return network.configureOS2Network(image, manifest, options);
-        }
-      }).then(function() {
-        if ((majorVersion == null) || majorVersion === 1) {
-          return network.configureOS1Network(image, manifest, options);
-        }
-      }).then(function() {
-        return operations.execute(image, configuration.operations, options);
-      });
+    }).then(function() {
+      if ((majorVersion == null) || majorVersion === 1) {
+        return network.configureOS1Network(image, manifest, options);
+      }
+    }).then(function() {
+      return operations.execute(image, configuration.operations, options);
     });
   });
 };
@@ -103,13 +105,13 @@ exports.configure = function(image, deviceType, config, options) {
  * @public
  *
  * @param {String} image - path to image
- * @param {String} deviceType - device type slug
+ * @param {Object} manifest - device type manifest
  * @param {Object} options - configuration options
  *
  * @returns {Promise<EventEmitter>} initialization event emitter
  *
  * @example
- * init.initialize('my/rpi.img', 'raspberry-pi', network: 'ethernet').then (configuration) ->
+ * init.initialize('my/rpi.img', manifest, network: 'ethernet').then (configuration) ->
  *
  * 	configuration.on('stdout', process.stdout.write)
  * 	configuration.on('stderr', process.stderr.write)
@@ -128,8 +130,6 @@ exports.configure = function(image, deviceType, config, options) {
  * 		console.log('Configuration finished')
  */
 
-exports.initialize = function(image, deviceType, options) {
-  return utils.getManifestByDeviceType(image, deviceType).then(function(manifest) {
-    return operations.execute(image, manifest.initialization.operations, options);
-  });
+exports.initialize = function(image, manifest, options) {
+  return operations.execute(image, manifest.initialization.operations, options);
 };
