@@ -49,6 +49,9 @@ waitStream = (stream) ->
 		stream.on('close', resolve)
 		stream.on('end', resolve)
 
+getManifest = (slug) ->
+	sdk.models.device.getManifestBySlug(slug)
+
 ########################################################################
 # Raspberry Pi
 ########################################################################
@@ -61,7 +64,8 @@ wary.it 'should add a config.json correctly to a raspberry pi',
 		isTestConfig: true
 
 	sdk.models.device.get(DEVICES.raspberrypi.id).then (device) ->
-		init.configure(images.raspberrypi, device.device_type, config)
+		getManifest(device.device_type).then (manifest) ->
+			init.configure(images.raspberrypi, manifest, config)
 	.then(waitStream)
 	.then ->
 		Promise.using imagefs.read(
@@ -81,7 +85,9 @@ wary.it 'should add a correct config.json to a raspberry pi containing a device-
 		isTestConfig: true
 
 	sdk.models.device.get(DEVICES.raspberrypi.id).then (device) ->
-		init.configure(images.raspberrypi, device.device_type, config)
+		# make sure the device-type.json file is read from the image
+		init.getImageManifest(images.raspberrypi).then (manifest) ->
+			init.configure(images.raspberrypi, manifest, config)
 	.then(waitStream)
 	.then ->
 		Promise.using imagefs.read(
@@ -103,7 +109,8 @@ wary.it 'should add network correctly to a 1.x raspberry pi',
 		wifiKey: 'testWifiKey'
 
 	sdk.models.device.get(DEVICES.raspberrypi.id).then (device) ->
-		init.configure(images.raspberrypi, device.device_type, {}, options)
+		getManifest(device.device_type).then (manifest) ->
+			init.configure(images.raspberrypi, manifest, {}, options)
 	.then(waitStream)
 	.then ->
 		Promise.using imagefs.read(
@@ -129,7 +136,8 @@ wary.it 'should add network correctly to a 2.x raspberry pi',
 		wifiKey: 'testWifiKey'
 
 	sdk.models.device.get(DEVICES.raspberrypi.id).then (device) ->
-		init.configure(images.raspberrypi, device.device_type, {}, options)
+		getManifest(device.device_type).then (manifest) ->
+			init.configure(images.raspberrypi, manifest, {}, options)
 	.then(waitStream)
 	.then ->
 		Promise.using imagefs.read(
@@ -147,7 +155,8 @@ wary.it 'should not trigger a state event when configuring a raspberry pi',
 	spy = m.sinon.spy()
 
 	sdk.models.device.get(DEVICES.raspberrypi.id).then (device) ->
-		init.configure(images.raspberrypi, device.device_type, {})
+		getManifest(device.device_type).then (manifest) ->
+			init.configure(images.raspberrypi, manifest, {})
 	.then (configuration) ->
 		configuration.on('state', spy)
 		return waitStream(configuration)
@@ -164,9 +173,10 @@ wary.it 'should initialize a raspberry pi image',
 		size: fs.statSync(images.random).size
 
 	sdk.models.device.get(DEVICES.raspberrypi.id).then (device) ->
-		init.configure(images.raspberrypi, device.device_type, {})
-	.then(waitStream).then ->
-		init.initialize(images.raspberrypi, 'raspberry-pi', { drive })
+		getManifest(device.device_type).then (manifest) ->
+			init.configure(images.raspberrypi, manifest, {})
+			.then(waitStream).then ->
+				init.initialize(images.raspberrypi, manifest, { drive })
 	.then(waitStream).then ->
 		Promise.props
 			raspberrypi: fs.readFileAsync(images.raspberrypi)
@@ -184,13 +194,11 @@ wary.it 'should initialize a raspberry pi image containing a device type',
 		size: fs.statSync(images.random).size
 
 	sdk.models.device.get(DEVICES.raspberrypi.id).then (device) ->
-		init.configure(images.raspberrypi, device.device_type, {})
-	.then(waitStream).then ->
-
-		# We use a nonsense device type name here to make
-		# sure the device-type.json file is read from the device
-		init.initialize(images.raspberrypi, 'foobar', { drive })
-
+		# make sure the device-type.json file is read from the image
+		init.getImageManifest(images.raspberrypi).then (manifest) ->
+			init.configure(images.raspberrypi, manifest, {})
+			.then(waitStream).then ->
+				init.initialize(images.raspberrypi, manifest, { drive })
 	.then(waitStream).then ->
 		Promise.props
 			raspberrypi: fs.readFileAsync(images.raspberrypi)
@@ -210,9 +218,10 @@ wary.it 'should emit state events when initializing a raspberry pi',
 	spy = m.sinon.spy()
 
 	sdk.models.device.get(DEVICES.raspberrypi.id).then (device) ->
-		init.configure(images.raspberrypi, device.device_type, {})
-	.then(waitStream).then ->
-		init.initialize(images.raspberrypi, 'raspberry-pi', { drive })
+		getManifest(device.device_type).then (manifest) ->
+			init.configure(images.raspberrypi, manifest, {})
+			.then(waitStream).then ->
+				init.initialize(images.raspberrypi, manifest, { drive })
 	.then (initialization) ->
 		initialization.on('state', spy)
 		return waitStream(initialization)
@@ -234,9 +243,10 @@ wary.it 'should emit burn events when initializing a raspberry pi',
 	spy = m.sinon.spy()
 
 	sdk.models.device.get(DEVICES.raspberrypi.id).then (device) ->
-		init.configure(images.raspberrypi, device.device_type, {})
-	.then(waitStream).then ->
-		init.initialize(images.raspberrypi, 'raspberry-pi', { drive })
+		getManifest(device.device_type).then (manifest) ->
+			init.configure(images.raspberrypi, manifest, {})
+			.then(waitStream).then ->
+				init.initialize(images.raspberrypi, manifest, { drive })
 	.then (initialization) ->
 		initialization.on('burn', spy)
 		return waitStream(initialization)
@@ -258,7 +268,8 @@ wary.it 'should add a config.json to an intel edison',
 		isTestConfig: true
 
 	sdk.models.device.get(DEVICES.edison.id).then (device) ->
-		init.configure(images.edison, device.device_type, config)
+		getManifest(device.device_type).then (manifest) ->
+			init.configure(images.edison, manifest, config)
 	.then(waitStream)
 	.then ->
 		Promise.using imagefs.read(
@@ -276,7 +287,8 @@ wary.it 'should not trigger a state event when configuring an intel edison',
 	spy = m.sinon.spy()
 
 	sdk.models.device.get(DEVICES.edison.id).then (device) ->
-		init.configure(images.edison, device.device_type, {})
+		getManifest(device.device_type).then (manifest) ->
+			init.configure(images.edison, manifest, {})
 	.then (configuration) ->
 		configuration.on('state', spy)
 		return waitStream(configuration)
@@ -291,10 +303,10 @@ wary.it 'should be able to initialize an intel edison with a script',
 	stderr = ''
 
 	sdk.models.device.get(DEVICES.edison.id).then (device) ->
-		init.configure(images.edison, device.device_type, {})
-	.then(waitStream)
-	.then ->
-		init.initialize(images.edison, 'intel-edison', {})
+		getManifest(device.device_type).then (manifest) ->
+			init.configure(images.edison, manifest, {})
+			.then(waitStream).then ->
+				init.initialize(images.edison, manifest, {})
 	.then (initialization) ->
 
 		initialization.on 'stdout', (data) ->

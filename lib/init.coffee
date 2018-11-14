@@ -25,23 +25,26 @@ resinSemver = require('resin-semver')
 utils = require('./utils')
 network = require('./network')
 
+exports.getImageManifest = utils.getImageManifest
+exports.getImageOsVersion = utils.getImageOsVersion
+
 ###*
 # @summary Configure an image with an application
 # @function
 # @public
 #
 # @description
-# This function injects `config.json` and network settings into the device.
+# This function injects `config.json` and network settings into the image.
 #
 # @param {String} image - path to image
-# @param {String} device type - device type slug
+# @param {Object} manifest - device type manifest
 # @param {Object} config - a fully populated config object
 # @param {Object} [options] - configuration options
 #
 # @returns {Promise<EventEmitter>} configuration event emitter
 #
 # @example
-# init.configure('my/rpi.img', 'raspberrypi', config).then (configuration) ->
+# init.configure('my/rpi.img', manifest, config).then (configuration) ->
 #
 # 	configuration.on('stdout', process.stdout.write)
 # 	configuration.on('stderr', process.stderr.write)
@@ -56,32 +59,30 @@ network = require('./network')
 # 	configuration.on 'end', ->
 # 		console.log('Configuration finished')
 ###
-exports.configure = (image, deviceType, config, options = {}) ->
-	utils.getManifestByDeviceType(image, deviceType)
-	.then (manifest) ->
-		Promise.try ->
-			# We only know how to find /etc/os-release on specific types of OS image. In future, we'd like to be able
-			# to do this for any image, but for now we'll just treat others as unknowable (which means below we'll
-			# configure the network to work for _either_ OS version.
-			if manifest.yocto?.image == 'resin-image' and _.includes(['resinos-img', 'resin-sdcard'], manifest.yocto?.fstype)
-				utils.getImageOsVersion(image)
-		.then (osVersion) ->
-			configuration = manifest.configuration
+exports.configure = (image, manifest, config, options = {}) ->
+	Promise.try ->
+		# We only know how to find /etc/os-release on specific types of OS image. In future, we'd like to be able
+		# to do this for any image, but for now we'll just treat others as unknowable (which means below we'll
+		# configure the network to work for _either_ OS version.
+		if manifest.yocto?.image == 'resin-image' and _.includes(['resinos-img', 'resin-sdcard'], manifest.yocto?.fstype)
+			utils.getImageOsVersion(image, manifest)
+	.then (osVersion) ->
+		configuration = manifest.configuration
 
-			majorVersion = resinSemver.major(osVersion)
+		majorVersion = resinSemver.major(osVersion)
 
-			configPathDefinition = utils.convertFilePathDefinition(configuration.config)
-			utils.writeConfigJSON(image, config, configPathDefinition)
-			.then ->
-				# Configure for OS2 if it is OS2, or if we're just not sure
-				if not majorVersion? || majorVersion == 2
-					network.configureOS2Network(image, manifest, options)
-			.then ->
-				# Configure for OS1 if it is OS1, or if we're just not sure
-				if not majorVersion? || majorVersion == 1
-					network.configureOS1Network(image, manifest, options)
-			.then ->
-				return operations.execute(image, configuration.operations, options)
+		configPathDefinition = utils.convertFilePathDefinition(configuration.config)
+		utils.writeConfigJSON(image, config, configPathDefinition)
+		.then ->
+			# Configure for OS2 if it is OS2, or if we're just not sure
+			if not majorVersion? || majorVersion == 2
+				network.configureOS2Network(image, manifest, options)
+		.then ->
+			# Configure for OS1 if it is OS1, or if we're just not sure
+			if not majorVersion? || majorVersion == 1
+				network.configureOS1Network(image, manifest, options)
+		.then ->
+			return operations.execute(image, configuration.operations, options)
 
 ###*
 # @summary Initialize an image
@@ -89,13 +90,13 @@ exports.configure = (image, deviceType, config, options = {}) ->
 # @public
 #
 # @param {String} image - path to image
-# @param {String} deviceType - device type slug
+# @param {Object} manifest - device type manifest
 # @param {Object} options - configuration options
 #
 # @returns {Promise<EventEmitter>} initialization event emitter
 #
 # @example
-# init.initialize('my/rpi.img', 'raspberry-pi', network: 'ethernet').then (configuration) ->
+# init.initialize('my/rpi.img', manifest, network: 'ethernet').then (configuration) ->
 #
 # 	configuration.on('stdout', process.stdout.write)
 # 	configuration.on('stderr', process.stderr.write)
@@ -113,7 +114,5 @@ exports.configure = (image, deviceType, config, options = {}) ->
 # 	configuration.on 'end', ->
 # 		console.log('Configuration finished')
 ###
-exports.initialize = (image, deviceType, options) ->
-	utils.getManifestByDeviceType(image, deviceType)
-	.then (manifest) ->
-		return operations.execute(image, manifest.initialization.operations, options)
+exports.initialize = (image, manifest, options) ->
+	return operations.execute(image, manifest.initialization.operations, options)

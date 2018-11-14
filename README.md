@@ -28,13 +28,13 @@ Documentation
 
 
 * [init](#module_init)
-    * [.configure(image, device, config, [options])](#module_init.configure) ⇒ <code>Promise.&lt;EventEmitter&gt;</code>
-    * [.initialize(image, deviceType, options)](#module_init.initialize) ⇒ <code>Promise.&lt;EventEmitter&gt;</code>
+    * [.configure(image, manifest, config, [options])](#module_init.configure) ⇒ <code>Promise.&lt;EventEmitter&gt;</code>
+    * [.initialize(image, manifest, options)](#module_init.initialize) ⇒ <code>Promise.&lt;EventEmitter&gt;</code>
 
 <a name="module_init.configure"></a>
 
-### init.configure(image, device, config, [options]) ⇒ <code>Promise.&lt;EventEmitter&gt;</code>
-This function injects `config.json` and network settings into the device.
+### init.configure(image, manifest, config, [options]) ⇒ <code>Promise.&lt;EventEmitter&gt;</code>
+This function injects `config.json` and network settings into the image.
 
 **Kind**: static method of <code>[init](#module_init)</code>  
 **Summary**: Configure an image with an application  
@@ -44,13 +44,13 @@ This function injects `config.json` and network settings into the device.
 | Param | Type | Description |
 | --- | --- | --- |
 | image | <code>String</code> | path to image |
-| device | <code>String</code> | type - device type slug |
+| manifest | <code>Object</code> | device type manifest |
 | config | <code>Object</code> | a fully populated config object |
 | [options] | <code>Object</code> | configuration options |
 
 **Example**  
 ```js
-init.configure('my/rpi.img', 'raspberrypi', config).then (configuration) ->
+init.configure('my/rpi.img', manifest, config).then (configuration) ->
 
 	configuration.on('stdout', process.stdout.write)
 	configuration.on('stderr', process.stderr.write)
@@ -67,7 +67,7 @@ init.configure('my/rpi.img', 'raspberrypi', config).then (configuration) ->
 ```
 <a name="module_init.initialize"></a>
 
-### init.initialize(image, deviceType, options) ⇒ <code>Promise.&lt;EventEmitter&gt;</code>
+### init.initialize(image, manifest, options) ⇒ <code>Promise.&lt;EventEmitter&gt;</code>
 **Kind**: static method of <code>[init](#module_init)</code>  
 **Summary**: Initialize an image  
 **Returns**: <code>Promise.&lt;EventEmitter&gt;</code> - initialization event emitter  
@@ -76,12 +76,12 @@ init.configure('my/rpi.img', 'raspberrypi', config).then (configuration) ->
 | Param | Type | Description |
 | --- | --- | --- |
 | image | <code>String</code> | path to image |
-| deviceType | <code>String</code> | device type slug |
+| manifest | <code>Object</code> | device type manifest |
 | options | <code>Object</code> | configuration options |
 
 **Example**  
 ```js
-init.initialize('my/rpi.img', 'raspberry-pi', network: 'ethernet').then (configuration) ->
+init.initialize('my/rpi.img', manifest, network: 'ethernet').then (configuration) ->
 
 	configuration.on('stdout', process.stdout.write)
 	configuration.on('stderr', process.stderr.write)

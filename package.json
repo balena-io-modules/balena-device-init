@@ -28,6 +28,7 @@
   "author": "Juan Cruz Viotti <juan@balena.io>",
   "license": "Apache-2.0",
   "devDependencies": {
+    "balena-sdk": "^11.0.0",
     "coffee-script": "~1.12.4",
     "dotenv": "^4.0.0",
     "gulp": "^3.9.0",
@@ -41,7 +42,6 @@
     "wary": "^1.1.0"
   },
   "dependencies": {
-    "balena-sdk": "^11.0.0",
     "bluebird": "^3.5.0",
     "lodash": "^4.17.4",
     "reconfix": "0.1.0",

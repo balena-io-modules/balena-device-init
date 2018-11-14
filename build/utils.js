@@ -15,7 +15,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-var Promise, _, imagefs, path, rindle, sdk, stringToStream;
+var Promise, _, convertFilePathDefinition, definitionForImage, imagefs, path, rindle, stringToStream;
 
 Promise = require('bluebird');
 
@@ -29,31 +29,25 @@ stringToStream = require('string-to-stream');
 
 imagefs = require('resin-image-fs');
 
-sdk = require('balena-sdk').fromSharedOptions();
-
 
 /**
- * @summary Get device type manifest by a device type name
+ * @summary Get device type manifest of an image
  * @function
- * @protected
  *
  * @param {String} image - path to image
- * @param {String} deviceType - device type slug
- * @returns {Promise<Object>} device type manifest
+ * @returns {Promise<Object | null>} device type manifest or null
  *
  * @example
- * utils.getManifestByDeviceType('path/to/image.img', 'raspberry-pi').then (manifest) ->
+ * utils.getImageManifest('path/to/image.img', 'raspberry-pi').then (manifest) ->
  * 	console.log(manifest)
  */
 
-exports.getManifestByDeviceType = function(image, deviceType) {
+exports.getImageManifest = function(image) {
   return Promise.using(imagefs.read({
     image: image,
     partition: 1,
     path: '/device-type.json'
-  }), rindle.extractAsync).then(JSON.parse)["catch"](function() {
-    return sdk.models.device.getManifestBySlug(deviceType);
-  });
+  }), rindle.extractAsync).then(JSON.parse).catchReturn(null);
 };
 
 
@@ -74,7 +68,7 @@ exports.getManifestByDeviceType = function(image, deviceType) {
  * 	path: '/config.json'
  */
 
-exports.convertFilePathDefinition = function(inputDefinition) {
+exports.convertFilePathDefinition = convertFilePathDefinition = function(inputDefinition) {
   var definition;
   definition = _.cloneDeep(inputDefinition);
   if (_.isObject(definition.partition)) {
@@ -106,7 +100,7 @@ exports.convertFilePathDefinition = function(inputDefinition) {
  * 	path: '/config.json'
  */
 
-exports.definitionForImage = function(image, configDefinition) {
+exports.definitionForImage = definitionForImage = function(image, configDefinition) {
   configDefinition = _.cloneDeep(configDefinition);
   if (configDefinition.image != null) {
     configDefinition.image = path.join(image, configDefinition.image);
@@ -120,22 +114,25 @@ exports.definitionForImage = function(image, configDefinition) {
 /**
  * @summary Get image OS version
  * @function
- * @protected
  *
  * @param {String} image - path to image
+ * @param {Object} manifest - device type manifest
  * @returns {Promise<string|null>} ResinOS version, or null if it could not be determined
  *
  * @example
- * utils.getImageOsVersion('path/to/image.img').then (version) ->
+ * utils.getImageOsVersion('path/to/image.img', manifest).then (version) ->
  * 	console.log(version)
  */
 
-exports.getImageOsVersion = function(image) {
-  return Promise.resolve(imagefs.readFile({
-    image: image,
-    partition: 2,
-    path: '/etc/os-release'
-  })).then(function(osReleaseString) {
+exports.getImageOsVersion = function(image, manifest) {
+  var definition, ref;
+  definition = (ref = manifest != null ? manifest.configuration.config : void 0) != null ? ref : {
+    partition: 1
+  };
+  definition = definitionForImage(image, definition);
+  definition = convertFilePathDefinition(definition);
+  definition.path = '/os-release';
+  return Promise.resolve(imagefs.readFile(definition)).then(function(osReleaseString) {
     var parsedOsRelease;
     parsedOsRelease = _(osReleaseString).split('\n').map(function(line) {
       var match;
