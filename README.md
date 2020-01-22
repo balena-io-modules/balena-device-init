@@ -28,17 +28,17 @@ Documentation
 
 
 * [init](#module_init)
-    * [.configure(image, manifest, config, [options])](#module_init.configure) ⇒ <code>Promise.&lt;EventEmitter&gt;</code>
-    * [.initialize(image, manifest, options)](#module_init.initialize) ⇒ <code>Promise.&lt;EventEmitter&gt;</code>
+    * [.configure(image, manifest, config, [options])](#module_init.configure) ⇒ <code>[ &#x27;Promise&#x27; ].&lt;EventEmitter&gt;</code>
+    * [.initialize(image, manifest, options)](#module_init.initialize) ⇒ <code>[ &#x27;Promise&#x27; ].&lt;EventEmitter&gt;</code>
 
 <a name="module_init.configure"></a>
 
-### init.configure(image, manifest, config, [options]) ⇒ <code>Promise.&lt;EventEmitter&gt;</code>
+### init.configure(image, manifest, config, [options]) ⇒ <code>[ &#x27;Promise&#x27; ].&lt;EventEmitter&gt;</code>
 This function injects `config.json` and network settings into the image.
 
 **Kind**: static method of <code>[init](#module_init)</code>  
 **Summary**: Configure an image with an application  
-**Returns**: <code>Promise.&lt;EventEmitter&gt;</code> - configuration event emitter  
+**Returns**: <code>[ &#x27;Promise&#x27; ].&lt;EventEmitter&gt;</code> - configuration event emitter  
 **Access:** public  
 
 | Param | Type | Description |
@@ -67,10 +67,10 @@ init.configure('my/rpi.img', manifest, config).then (configuration) ->
 ```
 <a name="module_init.initialize"></a>
 
-### init.initialize(image, manifest, options) ⇒ <code>Promise.&lt;EventEmitter&gt;</code>
+### init.initialize(image, manifest, options) ⇒ <code>[ &#x27;Promise&#x27; ].&lt;EventEmitter&gt;</code>
 **Kind**: static method of <code>[init](#module_init)</code>  
 **Summary**: Initialize an image  
-**Returns**: <code>Promise.&lt;EventEmitter&gt;</code> - initialization event emitter  
+**Returns**: <code>[ &#x27;Promise&#x27; ].&lt;EventEmitter&gt;</code> - initialization event emitter  
 **Access:** public  
 
 | Param | Type | Description |
