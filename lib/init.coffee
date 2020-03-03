@@ -21,7 +21,7 @@ limitations under the License.
 _ = require('lodash')
 Promise = require('bluebird')
 operations = require('resin-device-operations')
-resinSemver = require('resin-semver')
+resinSemver = require('balena-semver')
 utils = require('./utils')
 network = require('./network')
 
