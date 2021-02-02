@@ -44,12 +44,12 @@
     "wary": "^1.1.1"
   },
   "dependencies": {
+    "balena-image-fs": "^7.0.6",
     "balena-semver": "^2.2.0",
     "bluebird": "^3.7.2",
     "lodash": "^4.17.15",
-    "reconfix": "0.1.0",
-    "resin-device-operations": "^1.6.0",
-    "resin-image-fs": "^5.0.9",
+    "reconfix": "github:balena-io/reconfix#reconfix-v0.1.0-fork",
+    "resin-device-operations": "github:balena-io-modules/resin-device-operations#node14fix",
     "rindle": "^1.3.4",
     "string-to-stream": "^1.1.1"
   }

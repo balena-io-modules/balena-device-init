@@ -19,7 +19,7 @@ _ = require('lodash')
 rindle = Promise.promisifyAll(require('rindle'))
 path = require('path')
 stringToStream = require('string-to-stream')
-imagefs = require('resin-image-fs')
+imagefs = require('balena-image-fs')
 
 ###*
 # @summary Get device type manifest of an image
@@ -36,11 +36,13 @@ exports.getImageManifest = (image) ->
 	# Attempt to read manifest from the first
 	# partition, but fallback to the API if
 	# we encounter any errors along the way.
-	Promise.using imagefs.read(
-		image: image
-		partition: 1
-		path: '/device-type.json'
-	), rindle.extractAsync
+	Promise.resolve imagefs.interact(
+		image
+		1
+		(_fs) ->
+			readFileAsync = Promise.promisify(_fs.readFile)
+			return readFileAsync('/device-type.json', { encoding: 'utf8' })
+	)
 	.then(JSON.parse)
 	.catchReturn(null)
 
@@ -128,7 +130,15 @@ exports.getImageOsVersion = (image, manifest) ->
 	definition = convertFilePathDefinition(definition)
 	definition.path = '/os-release'
 
-	Promise.resolve(imagefs.readFile(definition))
+	return Promise.resolve(
+		imagefs.interact(
+			definition.image
+			definition.partition
+			(_fs) ->
+				readFileAsync = Promise.promisify(_fs.readFile)
+				return readFileAsync(definition.path, { encoding: 'utf8' })
+		)
+	)
 	.then (osReleaseString) ->
 		parsedOsRelease = _(osReleaseString)
 			.split('\n')
@@ -176,4 +186,10 @@ exports.writeConfigJSON = (image, config, definition) ->
 
 	definition = exports.definitionForImage(image, definition)
 
-	return imagefs.write(definition, stringToStream(config))
+	return imagefs.interact(
+		definition.image
+		definition.partition
+		(_fs) ->
+			writeFileAsync = Promise.promisify(_fs.writeFile)
+			return writeFileAsync(definition.path, config)
+	)
