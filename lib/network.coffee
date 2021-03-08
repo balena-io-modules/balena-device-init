@@ -20,8 +20,9 @@ limitations under the License.
 
 _ = require('lodash')
 path = require('path')
-imagefs = require('resin-image-fs')
+imagefs = require('balena-image-fs')
 reconfix = require('reconfix')
+Promise = require('bluebird')
 
 utils = require('./utils')
 
@@ -92,14 +93,20 @@ prepareImageOS1NetworkConfig = (target, manifest) ->
 	# This is required because reconfix borks if the child files specified are
 	# completely undefined when it tries to read (before writing) the config
 	configFilePath = utils.definitionForImage(target, utils.convertFilePathDefinition(manifest.configuration.config))
-
-	imagefs.readFile(configFilePath)
-	.catch(fileNotFoundError, -> '{}')
-	.then(JSON.parse)
-	.then (contents) ->
-		contents.files ?= {}
-		contents.files['network/network.config'] ?= ''
-		imagefs.writeFile(configFilePath, JSON.stringify(contents))
+	imagefs.interact(
+		configFilePath.image
+		configFilePath.partition
+		(_fs) ->
+			readFileAsync = Promise.promisify(_fs.readFile)
+			writeFileAsync = Promise.promisify(_fs.writeFile)
+			return readFileAsync(configFilePath.path, { encoding: 'utf8' })
+			.catch(fileNotFoundError, -> '{}')
+			.then(JSON.parse)
+			.then (contents) ->
+				contents.files ?= {}
+				contents.files['network/network.config'] ?= ''
+				writeFileAsync(configFilePath.path, JSON.stringify(contents))
+	)
 
 ###*
 # @summary Prepare the image to ensure the wifi reconfix schema is applyable
@@ -125,7 +132,13 @@ prepareImageOS2WifiConfig = (target, manifest) ->
 	###
 	connectionsFolderDefinition = utils.definitionForImage(target, getConfigPathDefinition(manifest, CONNECTIONS_FOLDER))
 
-	imagefs.listDirectory(connectionsFolderDefinition)
+	imagefs.interact(
+		connectionsFolderDefinition.image
+		connectionsFolderDefinition.partition
+		(_fs) ->
+			readdirAsync = Promise.promisify(_fs.readdir)
+			return readdirAsync(connectionsFolderDefinition.path)
+	)
 	.then (files) ->
 
 		# The required file already exists
@@ -134,22 +147,42 @@ prepareImageOS2WifiConfig = (target, manifest) ->
 
 		# Fresh image, new format, according to https://github.com/resin-os/meta-resin/pull/770/files
 		if _.includes(files, 'resin-sample.ignore')
-			return imagefs.copy(
-				utils.definitionForImage(target, getConfigPathDefinition(manifest, "#{CONNECTIONS_FOLDER}/resin-sample.ignore"))
-				utils.definitionForImage(target, getConfigPathDefinition(manifest, "#{CONNECTIONS_FOLDER}/resin-wifi"))
+			inputDefinition = utils.definitionForImage(target, getConfigPathDefinition(manifest, "#{CONNECTIONS_FOLDER}/resin-sample.ignore"))
+			outputDefinition = utils.definitionForImage(target, getConfigPathDefinition(manifest, "#{CONNECTIONS_FOLDER}/resin-wifi"))
+			return imagefs.interact(
+				inputDefinition.image
+				inputDefinition.partition
+				(_fs) ->
+					readFileAsync = Promise.promisify(_fs.readFile)
+					writeFileAsync = Promise.promisify(_fs.writeFile)
+					return readFileAsync(inputDefinition.path, { encoding: 'utf8' })
+						.then (contents) ->
+							return writeFileAsync(outputDefinition.path, contents)
 			)
 
 		# Fresh image, old format
 		if _.includes(files, 'resin-sample')
-			return imagefs.copy(
-				utils.definitionForImage(target, getConfigPathDefinition(manifest, "#{CONNECTIONS_FOLDER}/resin-sample"))
-				utils.definitionForImage(target, getConfigPathDefinition(manifest, "#{CONNECTIONS_FOLDER}/resin-wifi"))
+			inputDefinition = utils.definitionForImage(target, getConfigPathDefinition(manifest, "#{CONNECTIONS_FOLDER}/resin-sample"))
+			outputDefinition = utils.definitionForImage(target, getConfigPathDefinition(manifest, "#{CONNECTIONS_FOLDER}/resin-wifi"))
+			return imagefs.interact(
+				inputDefinition.image
+				inputDefinition.partition
+				(_fs) ->
+					readFileAsync = Promise.promisify(_fs.readFile)
+					writeFileAsync = Promise.promisify(_fs.writeFile)
+					return readFileAsync(inputDefinition.path, { encoding: 'utf8' })
+						.then (contents) ->
+							return writeFileAsync(outputDefinition.path, contents)
 			)
 
 		# In case there's no file at all (shouldn't happen normally, but the file might have been removed)
-		return imagefs.writeFile(
-			utils.definitionForImage(target, getConfigPathDefinition(manifest, "#{CONNECTIONS_FOLDER}/resin-wifi"))
-			DEFAULT_CONNECTION_FILE
+		definition = utils.definitionForImage(target, getConfigPathDefinition(manifest, "#{CONNECTIONS_FOLDER}/resin-wifi"))
+		return imagefs.interact(
+			definition.image
+			definition.partition
+			(_fs) ->
+				writeFileAsync = Promise.promisify(_fs.writeFile)
+				return writeFileAsync(definition.path, DEFAULT_CONNECTION_FILE)
 		)
 
 # Taken from https://goo.gl/kr1kCt

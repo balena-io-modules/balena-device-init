@@ -11,7 +11,7 @@ sdk = require('balena-sdk')({
 	apiUrl: settings.get('apiUrl')
 })
 
-imagefs = require('resin-image-fs')
+imagefs = require('balena-image-fs')
 init = require('../lib/init')
 
 RASPBERRYPI_OS1 = path.join(__dirname, 'images', 'raspberrypi-os1.img')
@@ -55,7 +55,6 @@ getManifest = (slug) ->
 ########################################################################
 # Raspberry Pi
 ########################################################################
-
 wary.it 'should add a config.json correctly to a raspberry pi',
 	raspberrypi: RASPBERRYPI_OS1
 , (images) ->
@@ -68,11 +67,13 @@ wary.it 'should add a config.json correctly to a raspberry pi',
 			init.configure(images.raspberrypi, manifest, config)
 	.then(waitStream)
 	.then ->
-		Promise.using imagefs.read(
-			partition: 1
-			path: '/config.json'
-			image: images.raspberrypi
-		), extract
+		imagefs.interact(
+			images.raspberrypi
+			1
+			(_fs) -> 
+				readFileAsync = Promise.promisify(_fs.readFile)
+				return readFileAsync('/config.json', { encoding: 'utf8' })
+		)
 	.then(JSON.parse)
 	.then (config) ->
 		m.chai.expect(config.isTestConfig).to.equal(true)
@@ -90,11 +91,13 @@ wary.it 'should add a correct config.json to a raspberry pi containing a device-
 			init.configure(images.raspberrypi, manifest, config)
 	.then(waitStream)
 	.then ->
-		Promise.using imagefs.read(
-			partition: 5
-			path: '/config.json'
-			image: images.raspberrypi
-		), extract
+		imagefs.interact(
+			images.raspberrypi
+			5
+			(_fs) -> 
+				readFileAsync = Promise.promisify(_fs.readFile)
+				return readFileAsync('/config.json', { encoding: 'utf8' })
+		)
 	.then(JSON.parse)
 	.then (config) ->
 		m.chai.expect(config.isTestConfig).to.equal(true)
@@ -113,11 +116,13 @@ wary.it 'should add network correctly to a 1.x raspberry pi',
 			init.configure(images.raspberrypi, manifest, {}, options)
 	.then(waitStream)
 	.then ->
-		Promise.using imagefs.read(
-			partition: 1
-			path: '/config.json'
-			image: images.raspberrypi
-		), extract
+		imagefs.interact(
+			images.raspberrypi
+			1
+			(fs) -> 
+				readFileAsync = Promise.promisify(fs.readFile)
+				return readFileAsync('/config.json', { encoding: 'utf8' })
+		)
 	.then(JSON.parse)
 	.then (config) ->
 		m.chai.expect(config.wifiSsid).to.equal('testWifiSsid')
@@ -140,11 +145,13 @@ wary.it 'should add network correctly to a 2.x raspberry pi',
 			init.configure(images.raspberrypi, manifest, {}, options)
 	.then(waitStream)
 	.then ->
-		Promise.using imagefs.read(
-			partition: 1
-			path: '/system-connections/resin-wifi'
-			image: images.raspberrypi
-		), extract
+		imagefs.interact(
+			images.raspberrypi
+			1
+			(fs) -> 
+				readFileAsync = Promise.promisify(fs.readFile)
+				return readFileAsync('/system-connections/resin-wifi', { encoding: 'utf8' })
+		)
 	.then (wifiConfig) ->
 		m.chai.expect(wifiConfig).to.include('ssid=testWifiSsid')
 		m.chai.expect(wifiConfig).to.include('psk=testWifiKey')
@@ -272,10 +279,13 @@ wary.it 'should add a config.json to an intel edison',
 			init.configure(images.edison, manifest, config)
 	.then(waitStream)
 	.then ->
-		Promise.using imagefs.read(
-			path: '/config.json'
-			image: path.join(images.edison, 'resin-image-edison.hddimg')
-		), extract
+		imagefs.interact(
+			path.join(images.edison, 'resin-image-edison.hddimg')
+			undefined
+			(fs) -> 
+				readFileAsync = Promise.promisify(fs.readFile)
+				return readFileAsync('/config.json', { encoding: 'utf8' })
+		)
 	.then(JSON.parse)
 	.then (config) ->
 		m.chai.expect(config.isTestConfig).to.equal(true)

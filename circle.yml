@@ -16,22 +16,28 @@ buildSteps: &buildSteps
         - ./node-*
 
 jobs:
-  "node-6":
+  "node-10":
     docker:
-      - image: circleci/node:6
-    working_directory: ~/node-6
+      - image: circleci/node:10
+    working_directory: ~/node-10
     steps: *buildSteps
 
-  "node-8":
+  "node-12":
     docker:
-      - image: circleci/node:8
-    working_directory: ~/node-8
+      - image: circleci/node:12
+    working_directory: ~/node-12
+    steps: *buildSteps
+
+  "node-14":
+    docker:
+      - image: circleci/node:14
+    working_directory: ~/node-14
     steps: *buildSteps
 
   deploy:
     # For this to work NPM_TOKEN must be set for the account used for publishing
     docker:
-      - image: circleci/node:6
+      - image: circleci/node:10
     steps:
       - attach_workspace:
           at: $CIRCLE_WORKING_DIRECTORY
@@ -43,19 +49,24 @@ jobs:
       - deploy:
           name: Deploy to npm
           command: npm publish
-          # Output used for publish is from node 6 build
-          working_directory: $CIRCLE_WORKING_DIRECTORY/node-6
+          # Output used for publish is from node 10 build
+          working_directory: $CIRCLE_WORKING_DIRECTORY/node-10
 
 workflows:
   version: 2
   build:
     jobs:
-      - "node-6":
+      - "node-10":
           # Run for all tags (required to allow the deploy to trigger on version tags)
           filters:
             tags:
               only: /.*/
-      - "node-8":
+      - "node-12":
+          # Run for all tags (required to allow the deploy to trigger on version tags)
+          filters:
+            tags:
+              only: /.*/
+      - "node-14":
           # Run for all tags (required to allow the deploy to trigger on version tags)
           filters:
             tags:
@@ -63,8 +74,9 @@ workflows:
       - deploy:
           # Deploy passing builds if they're tagged with a version
           requires:
-            - "node-6"
-            - "node-8"
+            - "node-10"
+            - "node-12"
+            - "node-14"
           filters:
             tags:
               only: /^v\d+\.\d+\.\d+$/
