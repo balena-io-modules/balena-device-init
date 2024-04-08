@@ -1,0 +1,50 @@
+# https://docs.github.com/en/actions/creating-actions/creating-a-composite-action
+name: "Test custom"
+description: "Custom test step to run during a pull request"
+# this inputs are always provided by flowzone, so they must always be defined on the composite action
+inputs:
+  json:
+    description: "JSON stringified object containing all the inputs from the calling workflow"
+    required: true
+  secrets:
+    description: "JSON stringified object containing all the secrets from the calling workflow"
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Node.js 18
+      if: ${{ fromJSON(env.os_value)[0] == 'ubuntu-20.04' }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+
+    - name: Setup Node.js lts
+      if: ${{ fromJSON(env.os_value)[0] != 'ubuntu-20.04' }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: lts/*
+
+    - name: Install dependencies
+      shell: bash
+      run: |
+        if [ -e package-lock.json ]; then
+          npm ci
+        else
+          npm i
+        fi
+
+    - name: Run custom node tests
+      shell: bash
+      run: |
+        # os_value is a JSON array of runner labels but we are only looking at the first element
+        echo "OS: ${{ fromJSON(env.os_value)[0] }}"
+        node -v
+        npm -v
+
+        export TEST_EMAIL_KEY=${{ format('TEST_EMAIL{0}', fromJSON('{"windows-2019":"","ubuntu-20.04":"_1","macos-12":"_2"}')[fromJSON(env.os_value)[0]]) }}
+        export TEST_EMAIL=${{ fromJSON(inputs.secrets)[ format('TEST_EMAIL{0}', fromJSON('{"windows-2019":"","ubuntu-20.04":"_1","macos-12":"_2"}')[fromJSON(env.os_value)[0]]) ] }}
+        export TEST_PASSWORD=${{ fromJSON(inputs.secrets).TEST_PASSWORD }}
+
+        echo "TEST_EMAIL_KEY: [ ${TEST_EMAIL_KEY} ]"
+        echo "TEST_EMAIL: [ ${TEST_EMAIL} ]"
+        npm test

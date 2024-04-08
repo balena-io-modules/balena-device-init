@@ -20,8 +20,8 @@
   },
   "scripts": {
     "build": "gulp build && npm run readme",
-    "pretest": "npm run build",
-    "test": "gulp test && coffee tests/e2e.coffee",
+    "test": "([ \"$GITHUB_WORKFLOW\" = 'Flowzone' ] && [ \"$GITHUB_JOB\" = 'npm_test' ] && echo \"Skipping 'npm test' in flowzone in favor of the custom test action!\") || (npm run build && npm run test:all)",
+    "test:all": "gulp test && coffee tests/e2e.coffee",
     "prepare": "npm run build",
     "readme": "jsdoc2md --template doc/README.hbs build/init.js > README.md"
   },
