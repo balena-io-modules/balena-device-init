@@ -1,0 +1,330 @@
+- commits:
+    - subject: Update resin-device-operations to v2
+      hash: df57ac4af3c1800ce3ae0f2dbdb6f67504c5f6de
+      body: ""
+      footer:
+        Change-type: major
+        change-type: major
+      author: Thodoris Greasidis
+    - subject: Replace appveyor & circleci with flowzone
+      hash: 65a1372231334c7632f1875c799e2bdc43c2a09a
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Thodoris Greasidis
+    - subject: Stop using require-npm4-to-publish
+      hash: 838b3e316743271cc2d1263b33f57f3493432044
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Thodoris Greasidis
+    - subject: Drop support for node < 18
+      hash: d44e12012f6935a3086b038b9e3b9bf529c18f00
+      body: ""
+      footer:
+        Change-type: major
+        change-type: major
+      author: Thodoris Greasidis
+  version: 7.0.0
+  title: ""
+  date: 2024-04-09T13:55:36.286Z
+- version: 6.0.0
+  date: 2021-03-08T09:12:55Z
+  commits:
+    - hash: b63e300a8882d686cd5fe2d9c9eaa6f429895871
+      author: Marios Balamatsias
+      footers:
+        connects-to: https://github.com/balena-io/balena-cli/issues/2079
+        change-type: major
+        signed-off-by: Marios Balamatsias <mbalamatsias@gmail.com>
+      subject: Add support for Node14
+      body: ""
+    - hash: 20b0efd5e70e585c4702adaffe3d35bc37df9e8e
+      author: Marios Balamatsias
+      footers:
+        change-type: patch
+        signed-off-by: Marios Balamatsias <mbalamatsias@gmail.com>
+      subject: "package: npm install
+        resin-device-operations@1.7.0-node14fix-fef867a29205174d9a6706615585119\
+        158c90f96"
+      body: ""
+    - hash: bc07e3f02ed473289beec7347f12d380e38f5c76
+      author: Marios Balamatsias
+      footers:
+        change-type: minor
+        signed-off-by: Marios Balamatsias <mbalamatsias@gmail.com>
+      subject: "circleci: Use node versions 10, 12, 14"
+      body: ""
+- version: 5.0.2
+  date: 2020-03-04T13:44:06Z
+  commits:
+    - hash: d7070e1613dfcc19b67c126b949c63755a55c6ea
+      author: Pagan Gazzard
+      footers:
+        change-type: patch
+      subject: Update dependencies
+      body: ""
+- version: 5.0.1
+  date: 2020-01-22T16:17:06Z
+  commits:
+    - hash: 34c9de666299c2d3cceff242f9a1d9433f1cc8b4
+      author: Pagan Gazzard
+      footers:
+        change-type: patch
+      subject: Update dependencies
+      body: ""
+- version: 5.0.0
+  date: 2018-11-14T12:26:04Z
+  commits:
+    - hash: 3f0f840c36b4d6fd1427bf3f2ecf0404464b30d5
+      author: Akis Kesoglou
+      footers:
+        change-type: major
+      subject: Load OS version from boot partition for greater compatibility
+      body: This also removes the runtime dependency to balena-sdk and changes the
+        public API of `configure` and `initialize` to require a device type
+        manifest as an argument.
+- version: 4.3.0
+  date: 2018-10-30T14:28:04Z
+  commits:
+    - hash: ff55fd5d94e66600ace37104965b58216504618b
+      author: Tim Perry
+      footers:
+        change-type: minor
+      subject: Rename everything 'resin' to 'balena'
+      body: ""
+- version: 4.2.4
+  date: 2018-10-30T14:01:17Z
+  commits:
+    - hash: 05b6bb84c838bc592eaffee2105de269572eb95d
+      author: Tim Perry
+      footers:
+        change-type: patch
+      subject: Update to balena-SDK and parse balenaOS versions
+      body: ""
+- version: 4.2.3
+  date: 2018-10-24T14:38:26Z
+  commits:
+    - hash: 7b5810d1da6d823ed7f4587439e9dbef46aa871b
+      author: Paulo Castro
+      footers:
+        change-type: patch
+        signed-off-by: Paulo Castro <paulo@balena.io>
+      subject: Update resin-semver to support balenaOS version strings
+      body: ""
+- version: 4.2.2
+  date: 2018-09-18T16:14:10Z
+  commits:
+    - hash: 7353e7dd2873da52758fe1793aff5395968f3873
+      author: Lucian Buzzo
+      footers:
+        change-type: patch
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      subject: "dependencies: Update resin-semver version to support Balena OS"
+      body: "Connects to #32"
+- version: 4.2.1
+  date: 2018-05-31T11:33:01Z
+  commits:
+    - hash: 1abce7d6bffa05f31849e0744cb32ac430ccf5d3
+      author: Tim Perry
+      footers:
+        change-type: patch
+      subject: Update resin-image-fs & reconfix, to use a Node 10 compatible ext2fs
+      body: ""
+- version: 4.2.0
+  date: 2017-12-14T15:53:50Z
+  commits:
+    - hash: f270b8b5656c4d5c1d0eda52883676094de66b61
+      author: Tim Perry
+      footers:
+        change-type: minor
+      subject: Upgrade to new reconfix, adding support for GPT (i.e. TX2) configuration
+      body: ""
+    - hash: 07c22e3ea6d2cfce4ef0bc3166f32629be3553c1
+      author: Tim Perry
+      subject: Put changelog into versionbot format
+      body: ""
+- version: 4.1.0
+  date: 2017-11-28T21:44:26Z
+  commits:
+    - hash: 563d98c21d4e9623f96ca063def0c317bde8e2b7
+      author: Tim Perry
+      subject: Fix versionbot's changelog mess
+      body: ""
+    - hash: a38cef88a878663e0fe09d4b12701c425ab41bfc
+      author: Tim Perry
+      footers:
+        change-type: patch
+      subject: Upgrade to resin-image-fs@4, adding ext support
+      body: ""
+    - hash: bd1c6615eecb94837accfaa53f0307717d718c8b
+      author: Tim Perry
+      subject: Automatically build docs when you build and build before you test
+      body: ""
+    - hash: 5d8d710f6e80a519426567f34d83861a4bb5f7c5
+      author: Tim Perry
+      subject: Add an ext4 partition with valid /etc/os-release files to test images
+      body: ""
+    - hash: af283ccdf7172e7bddd694d7edcffdcb33701776
+      author: Tim Perry
+      subject: Read os-release from device images to get their OS version
+      body: ""
+    - hash: afc1ec07e5490194d8c687bbc2e94f9da0297efa
+      author: Tim Perry
+      footers:
+        connects-to: https://github.com/resin-io/resin-cli/issues/494
+        change-type: minor
+      subject: Make .configure() configure network settings for both 1.x & 2.x
+      body: ""
+    - hash: 405abab56a704d7b20eb8b110090ea13a4639d42
+      author: Tim Perry
+      subject: Handle device-types with no yocto info included
+      body: ""
+    - hash: fb8a3c258843a4bb8a7b1b63051105f1129d8b1c
+      author: Tim Perry
+      subject: Ensure we can correctly configure edison images and images with no
+        config.json
+      body: ""
+    - hash: 2fdafe29dc9a6433ab5fd674018f19f0dc7616b4
+      author: Tim Perry
+      subject: Post-review style tweaks
+      body: ""
+    - hash: 9a57f5844c4a1362ec644162ae09afc5857da169
+      author: Tim Perry
+      subject: Use rindle instead of stream-to-string
+      body: ""
+    - hash: 113907df5d4d205de0c8f9b8b205b6e4a3d2c493
+      author: Tim Perry
+      subject: Make sure we wait for OS2 network configuration to complete
+      body: ""
+    - hash: 991734eb3a19ea5891939304d4ae87abd456c04d
+      author: Tim Perry
+      subject: Add tests for network configuration
+      body: ""
+    - hash: 24ed40c4111cd02008e75b2d1a3985c582fdf847
+      author: Tim Perry
+      subject: Update to new resin-image-fs, with prebuild node-ext2fs
+      body: ""
+    - hash: e9033996591092dd04e96c7f6c9675d4ba845ab4
+      author: Tim Perry
+      subject: Test with node 8, stop testing node 4
+      body: ""
+    - hash: b06c3b3410ebf7469a3e99b95baaa749cd0a0470
+      author: Tim Perry
+      footers:
+        change-type: patch
+      subject: Upgrade to reconfix 0.0.4 to fix windows support
+      body: ""
+    - hash: 6f3d1315bad542c0214277f879a44d0e939cf219
+      author: Tim Perry
+      subject: Fix bug with unreadable os-release by using non-streaming read API
+      body: |-
+        Should've done this originally really. It'd be nice to also fix the
+        underlying streaming bug (which segfaults when trying to stream a
+        missing file through ext2fs), but this fixes the issue, and we'll want
+        this change regardless.
+- version: 4.0.1
+  date: 2017-11-21T17:16:48Z
+  commits:
+    - hash: 09cb749da078081c67a89aaa5ece7aa703d640c1
+      author: Tim Perry
+      footers:
+        change-type: patch
+      subject: Move from travis to circle and set up npm autopublishing
+      body: ""
+    - hash: a155400d91dfbbfcceea278d9ea3965439c21701
+      author: Tim Perry
+      subject: Update changelog ready for versionbot
+      body: ""
+- version: 4.0.0
+  date: 2017-10-13T09:40:48Z
+  commits:
+    - hash: 96594a4c4c7d7e17aa86c11f1a41a5d3d12cf973
+      author: Tim Perry
+      footers:
+        change-type: major
+      subject: Take config as an argument, rather than generating it ourselves
+      body: |-
+        This gives external clients a lot more flexibility about how they
+        generate config, and also opens the door for image configuration for
+        non-Resin.io ResinOS usage.
+    - hash: 45715b3b54c933d1356443ec795ed5e461a226d9
+      author: Tim Perry
+      footers:
+        change-type: major
+      subject: Expect `appUpdatePollInterval` in milliseconds, not seconds, and don't
+        stringify it
+      body: ""
+- version: 3.0.0
+  date: 2017-04-17T20:32:24Z
+  commits:
+    - hash: 0752869e99765316d19ea4a9dbde31ea85fa1010
+      author: Pagan Gazzard
+      subject: Store and use the entire device object for the tests, so we have access
+        to all the info
+      body: ""
+    - hash: 1ba8067ddfbbda0f543e88ff7b5743535b50e4a8
+      author: Pagan Gazzard
+      subject: Update resin-device-config and add the required `deviceApiKey`
+        parameter to `configure`
+      body: ""
+- version: 2.2.1
+  date: 2017-04-14T09:35:34Z
+  commits:
+    - hash: 97589d28f527754e0a40d72800f67a21433c2b19
+      author: Eugene Mirotin
+      subject: node v4 support
+      body: ""
+- version: 2.2.0
+  date: 2017-03-28T11:17:14Z
+  commits:
+    - hash: b27ee23f77a13c79ca4c768b757300e19f5b3ffe
+      author: Eugene Mirotin
+      subject: update dependencies
+      body: drop node v4, use v6 and latest
+- version: 2.1.1
+  date: 2017-01-19T21:25:01Z
+  commits:
+    - hash: 88a8d132d5f79ff2323ee2c1710a3ede7c0641f7
+      author: Juan Cruz Viotti
+      footers:
+        see: https://github.com/resin-io/resin-device-init/pull/18
+        signed-off-by: Juan Cruz Viotti <jviotti@openmailbox.org>
+      subject: Adapt test images and test suites to match newer device manifests
+      body: |-
+        - Update `config.json` location to the first partition
+        - Rename `config.img` to `resin-image-edison.hddimg` inside the Edison
+        directory
+    - hash: 6e60b077ca7390a73e0ebb2a950491bf6352382a
+      author: Tim Perry
+      subject: Move to preconfigured Resin-SDK
+      body: ""
+    - hash: 1d9171b6c1cbbfd2dbeb8541b83597fb294082b7
+      author: Tim Perry
+      subject: Document how to run the tests
+      body: ""
+    - hash: f0c689d6431fdb982eb3546868371c386a19e2a3
+      author: Juan Cruz Viotti
+      footers:
+        signed-off-by: Juan Cruz Viotti <jviotti@openmailbox.org>
+      subject: Attempt to read device type from first partition
+      body: |-
+        This PR extends the way we fetch the device type for the device we're
+        just about to initialise by trying to fetch it from the first partition
+        before falling back to the API.
+    - hash: e5e13a36ebf934953e02460e75d2f1dfb150c08f
+      author: Juan Cruz Viotti
+      footers:
+        signed-off-by: Juan Cruz Viotti <jviottidc@gmail.com>
+      subject: Upgrade Resin SDK to v5.2.0
+      body: Version v5.0.0 includes support for shorter uuids.
+    - hash: 99aa5b67e534526ae20ba3881e7be0d0c5a51966
+      author: Juan Cruz Viotti
+      footers:
+        signed-off-by: Juan Cruz Viotti <jviottidc@gmail.com>
+      subject: Upgrade resin-device-config to v3.0.1
+      body: |-
+        This version includes a fix to expand shorter uuids when generating a
+        `config.json`.
