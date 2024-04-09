@@ -22,7 +22,6 @@
     "build": "gulp build && npm run readme",
     "pretest": "npm run build",
     "test": "gulp test && coffee tests/e2e.coffee",
-    "prepublish": "require-npm4-to-publish",
     "prepare": "npm run build",
     "readme": "jsdoc2md --template doc/README.hbs build/init.js > README.md"
   },
@@ -43,7 +42,6 @@
     "jsdoc-to-markdown": "^5.0.3",
     "mocha": "^2.5.3",
     "mochainon": "^1.0.0",
-    "require-npm4-to-publish": "^1.0.0",
     "wary": "^1.1.1"
   },
   "dependencies": {
