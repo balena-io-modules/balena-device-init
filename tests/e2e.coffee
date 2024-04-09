@@ -7,6 +7,7 @@ fs = Promise.promisifyAll(require('fs'))
 wary = require('wary')
 
 settings = require('balena-settings-client')
+etcherSdk = require('etcher-sdk')
 sdk = require('balena-sdk')({
 	apiUrl: settings.get('apiUrl')
 })
@@ -170,14 +171,52 @@ wary.it 'should not trigger a state event when configuring a raspberry pi',
 	.then ->
 		m.chai.expect(spy).to.not.have.been.called
 
+mockBlockDeviceFromFile = (path) ->
+	drive = {
+		raw: path,
+		device: path,
+		devicePath: path,
+		displayName: path,
+		icon: 'some icon',
+		isSystem: false,
+		description: 'some description',
+		mountpoints: [],
+		size: fs.statSync(path).size,
+		isReadOnly: false,
+		busType: 'UNKNOWN',
+		error: null,
+		blockSize: 512,
+		busVersion: null,
+		enumerator: 'fake',
+		isCard: null,
+		isRemovable: true,
+		isSCSI: false,
+		isUAS: null,
+		isUSB: true,
+		isVirtual: false,
+		logicalBlockSize: 512,
+		partitionTableType: null,
+	};
+	device = new etcherSdk.sourceDestination.BlockDevice({
+		drive,
+		unmountOnSuccess: false,
+		write: true,
+		direct: false,
+	})
+
+	device._open = () ->
+		etcherSdk.sourceDestination.File.prototype._open.call(device)
+	device._close = () ->
+		etcherSdk.sourceDestination.File.prototype._close.call(device)
+
+	device
+
 wary.it 'should initialize a raspberry pi image',
 	raspberrypi: RASPBERRYPI_OS1
 	random: RANDOM
 , (images) ->
 
-	drive =
-		raw: images.random
-		size: fs.statSync(images.random).size
+	drive = mockBlockDeviceFromFile(images.random)
 
 	sdk.models.device.get(DEVICES.raspberrypi.id).then (device) ->
 		getManifest(device.device_type).then (manifest) ->
@@ -196,9 +235,7 @@ wary.it 'should initialize a raspberry pi image containing a device type',
 	random: RANDOM
 , (images) ->
 
-	drive =
-		raw: images.random
-		size: fs.statSync(images.random).size
+	drive = mockBlockDeviceFromFile(images.random)
 
 	sdk.models.device.get(DEVICES.raspberrypi.id).then (device) ->
 		# make sure the device-type.json file is read from the image
@@ -218,9 +255,7 @@ wary.it 'should emit state events when initializing a raspberry pi',
 	random: RANDOM
 , (images) ->
 
-	drive =
-		raw: images.random
-		size: fs.statSync(images.random).size
+	drive = mockBlockDeviceFromFile(images.random)
 
 	spy = m.sinon.spy()
 
@@ -243,9 +278,7 @@ wary.it 'should emit burn events when initializing a raspberry pi',
 	random: RANDOM
 , (images) ->
 
-	drive =
-		raw: images.random
-		size: fs.statSync(images.random).size
+	drive = mockBlockDeviceFromFile(images.random)
 
 	spy = m.sinon.spy()
 
