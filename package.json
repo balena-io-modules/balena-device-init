@@ -1,6 +1,6 @@
 {
   "name": "balena-device-init",
-  "version": "7.0.0",
+  "version": "7.0.1",
   "description": "Configure and initialize devices using device specs",
   "main": "build/init.js",
   "homepage": "https://github.com/balena-io/balena-device-init",
@@ -56,6 +56,6 @@
     "string-to-stream": "^1.1.1"
   },
   "versionist": {
-    "publishedAt": "2024-04-09T13:55:36.359Z"
+    "publishedAt": "2024-04-09T14:11:44.503Z"
   }
 }
