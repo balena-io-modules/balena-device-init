@@ -18,25 +18,32 @@ limitations under the License.
  * @module network
  */
 
-const _ = require('lodash');
-const path = require('path');
-const imagefs = require('balena-image-fs');
-const reconfix = require('reconfix');
-const Promise = require('bluebird');
-
-const utils = require('./utils');
+import _ from 'lodash';
+import type * as fsPromise from 'fs/promises';
+import path from 'path';
+import * as imagefs from 'balena-image-fs';
+import reconfix from 'reconfix';
+import Promise from 'bluebird';
+import * as utils from './utils';
+import type { DeviceTypeJsonWithConfiguration } from './device-type-json';
 
 const CONNECTIONS_FOLDER = '/system-connections';
 
-const getConfigPathDefinition = function(manifest, configPath) {
-	const configPathDefinition = utils.convertFilePathDefinition(manifest.configuration.config);
+const getConfigPathDefinition = function <
+	T extends DeviceTypeJsonWithConfiguration,
+>(manifest: T, configPath: string) {
+	const configPathDefinition = utils.convertFilePathDefinition(
+		manifest.configuration.config,
+	);
 
 	// Config locations are assumed to be the same as config.json, except the path itself
-	configPathDefinition.path = configPath;
-	return configPathDefinition;
+	return {
+		...configPathDefinition,
+		path: configPath,
+	};
 };
 
-const fileNotFoundError = e => e.code === 'ENOENT';
+const fileNotFoundError = (e: any): e is Error => e.code === 'ENOENT';
 
 /**
  * @summary Configure network on an ResinOS 1.x image
@@ -52,16 +59,20 @@ const fileNotFoundError = e => e.code === 'ENOENT';
  *
  * @returns {Promise<void>}
  */
-exports.configureOS1Network = (image, manifest, answers) => prepareImageOS1NetworkConfig(image, manifest)
-.then(function() {
-	const schema = getOS1ConfigurationSchema(manifest, answers);
+export const configureOS1Network = (
+	image: string,
+	manifest: DeviceTypeJsonWithConfiguration,
+	answers: Record<string, any>,
+) =>
+	prepareImageOS1NetworkConfig(image, manifest).then(function () {
+		const schema = getOS1ConfigurationSchema(manifest, answers);
 
-	if (manifest.configuration.config.image) {
-		image = path.join(image, manifest.configuration.config.image);
-	}
+		if (manifest.configuration.config.image) {
+			image = path.join(image, manifest.configuration.config.image);
+		}
 
-	return reconfix.writeConfiguration(schema, answers, image);
-});
+		return reconfix.writeConfiguration(schema, answers, image);
+	});
 
 /**
  * @summary Configure network on an ResinOS 2.x image
@@ -77,16 +88,19 @@ exports.configureOS1Network = (image, manifest, answers) => prepareImageOS1Netwo
  *
  * @returns {Promise<void>}
  */
-exports.configureOS2Network = function(image, manifest, answers) {
+export const configureOS2Network = function (
+	image: string,
+	manifest: DeviceTypeJsonWithConfiguration,
+	answers: Record<string, any>,
+) {
 	if (answers.network !== 'wifi') {
 		// For ethernet, we don't need to do anything
 		// For anything else, we don't know what to do
 		return;
 	}
 
-	return prepareImageOS2WifiConfig(image, manifest)
-	.then(function() {
-		const schema = getOS2WifiConfigurationSchema(manifest, answers);
+	return prepareImageOS2WifiConfig(image, manifest).then(function () {
+		const schema = getOS2WifiConfigurationSchema(manifest);
 		if (manifest.configuration.config.image) {
 			image = path.join(image, manifest.configuration.config.image);
 		}
@@ -94,24 +108,42 @@ exports.configureOS2Network = function(image, manifest, answers) {
 	});
 };
 
-var prepareImageOS1NetworkConfig = function(target, manifest) {
+const prepareImageOS1NetworkConfig = function (
+	target: string,
+	manifest: DeviceTypeJsonWithConfiguration,
+) {
 	// This is required because reconfix borks if the child files specified are
 	// completely undefined when it tries to read (before writing) the config
-	const configFilePath = utils.definitionForImage(target, utils.convertFilePathDefinition(manifest.configuration.config));
+	const configFilePath = utils.definitionForImage(
+		target,
+		utils.convertFilePathDefinition(manifest.configuration.config),
+	);
 	return imagefs.interact(
 		configFilePath.image,
 		configFilePath.partition,
-		function(_fs) {
-			const readFileAsync = Promise.promisify(_fs.readFile);
+		function (_fs) {
+			const readFileAsync = Promise.promisify(
+				_fs.readFile,
+			) as typeof fsPromise.readFile;
 			const writeFileAsync = Promise.promisify(_fs.writeFile);
-			return readFileAsync(configFilePath.path, { encoding: 'utf8' })
-			.catch(fileNotFoundError, () => '{}')
-			.then(JSON.parse)
-			.then(function(contents) {
-				if (contents.files == null) { contents.files = {}; }
-				if (contents.files['network/network.config'] == null) { contents.files['network/network.config'] = ''; }
-				return writeFileAsync(configFilePath.path, JSON.stringify(contents));});
-	});
+			return (
+				readFileAsync(configFilePath.path, {
+					encoding: 'utf8',
+				}) as Promise<string>
+			)
+				.catch(fileNotFoundError, () => '{}')
+				.then(JSON.parse)
+				.then(function (contents) {
+					if (contents.files == null) {
+						contents.files = {};
+					}
+					if (contents.files['network/network.config'] == null) {
+						contents.files['network/network.config'] = '';
+					}
+					return writeFileAsync(configFilePath.path, JSON.stringify(contents));
+				});
+		},
+	);
 };
 
 /**
@@ -128,7 +160,10 @@ var prepareImageOS1NetworkConfig = function(target, manifest) {
  *
  * @returns {Promise<void>}
  */
-var prepareImageOS2WifiConfig = function(target, manifest) {
+const prepareImageOS2WifiConfig = function (
+	target: string,
+	manifest: DeviceTypeJsonWithConfiguration,
+) {
 	/*
 	 * We need to ensure a template network settings file exists at resin-wifi. To do that:
 	 * * if the `resin-wifi` file exists (previously configured image or downloaded from the UI) we're all good
@@ -136,67 +171,106 @@ var prepareImageOS2WifiConfig = function(target, manifest) {
 	 * * if the `resin-sample.ignore` exists, it's copied to `resin-wifi`
 	 * * otherwise, the new file is created from a hardcoded template
 	 */
-	const connectionsFolderDefinition = utils.definitionForImage(target, getConfigPathDefinition(manifest, CONNECTIONS_FOLDER));
+	const connectionsFolderDefinition = utils.definitionForImage(
+		target,
+		getConfigPathDefinition(manifest, CONNECTIONS_FOLDER),
+	);
 
-	return imagefs.interact(
-		connectionsFolderDefinition.image,
-		connectionsFolderDefinition.partition,
-		function(_fs) {
-			const readdirAsync = Promise.promisify(_fs.readdir);
-			return readdirAsync(connectionsFolderDefinition.path);
-	})
-	.then(function(files) {
+	return imagefs
+		.interact(
+			connectionsFolderDefinition.image,
+			connectionsFolderDefinition.partition,
+			function (_fs) {
+				const readdirAsync = Promise.promisify(_fs.readdir);
+				return readdirAsync(connectionsFolderDefinition.path) as Promise<
+					string[]
+				>;
+			},
+		)
+		.then(function (files) {
+			// The required file already exists
+			if (_.includes(files, 'resin-wifi')) {
+				return;
+			}
 
-		// The required file already exists
-		let inputDefinition, outputDefinition;
-		if (_.includes(files, 'resin-wifi')) {
-			return;
-		}
+			// Fresh image, new format, according to https://github.com/resin-os/meta-resin/pull/770/files
+			if (_.includes(files, 'resin-sample.ignore')) {
+				const inputDefinition = utils.definitionForImage(
+					target,
+					getConfigPathDefinition(
+						manifest,
+						`${CONNECTIONS_FOLDER}/resin-sample.ignore`,
+					),
+				);
+				const outputDefinition = utils.definitionForImage(
+					target,
+					getConfigPathDefinition(manifest, `${CONNECTIONS_FOLDER}/resin-wifi`),
+				);
+				return imagefs.interact(
+					inputDefinition.image,
+					inputDefinition.partition,
+					function (_fs) {
+						const readFileAsync = Promise.promisify(
+							_fs.readFile,
+						) as typeof fsPromise.readFile;
+						const writeFileAsync = Promise.promisify(_fs.writeFile);
+						return readFileAsync(inputDefinition.path, {
+							encoding: 'utf8',
+						}).then((contents) =>
+							writeFileAsync(outputDefinition.path, contents),
+						);
+					},
+				);
+			}
 
-		// Fresh image, new format, according to https://github.com/resin-os/meta-resin/pull/770/files
-		if (_.includes(files, 'resin-sample.ignore')) {
-			inputDefinition = utils.definitionForImage(target, getConfigPathDefinition(manifest, `${CONNECTIONS_FOLDER}/resin-sample.ignore`));
-			outputDefinition = utils.definitionForImage(target, getConfigPathDefinition(manifest, `${CONNECTIONS_FOLDER}/resin-wifi`));
+			// Fresh image, old format
+			if (_.includes(files, 'resin-sample')) {
+				const inputDefinition = utils.definitionForImage(
+					target,
+					getConfigPathDefinition(
+						manifest,
+						`${CONNECTIONS_FOLDER}/resin-sample`,
+					),
+				);
+				const outputDefinition = utils.definitionForImage(
+					target,
+					getConfigPathDefinition(manifest, `${CONNECTIONS_FOLDER}/resin-wifi`),
+				);
+				return imagefs.interact(
+					inputDefinition.image,
+					inputDefinition.partition,
+					function (_fs) {
+						const readFileAsync = Promise.promisify(
+							_fs.readFile,
+						) as typeof fsPromise.readFile;
+						const writeFileAsync = Promise.promisify(_fs.writeFile);
+						return readFileAsync(inputDefinition.path, {
+							encoding: 'utf8',
+						}).then((contents) =>
+							writeFileAsync(outputDefinition.path, contents),
+						);
+					},
+				);
+			}
+
+			// In case there's no file at all (shouldn't happen normally, but the file might have been removed)
+			const definition = utils.definitionForImage(
+				target,
+				getConfigPathDefinition(manifest, `${CONNECTIONS_FOLDER}/resin-wifi`),
+			);
 			return imagefs.interact(
-				inputDefinition.image,
-				inputDefinition.partition,
-				function(_fs) {
-					const readFileAsync = Promise.promisify(_fs.readFile);
+				definition.image,
+				definition.partition,
+				function (_fs) {
 					const writeFileAsync = Promise.promisify(_fs.writeFile);
-					return readFileAsync(inputDefinition.path, { encoding: 'utf8' })
-						.then(contents => writeFileAsync(outputDefinition.path, contents));
-			});
-		}
-
-		// Fresh image, old format
-		if (_.includes(files, 'resin-sample')) {
-			inputDefinition = utils.definitionForImage(target, getConfigPathDefinition(manifest, `${CONNECTIONS_FOLDER}/resin-sample`));
-			outputDefinition = utils.definitionForImage(target, getConfigPathDefinition(manifest, `${CONNECTIONS_FOLDER}/resin-wifi`));
-			return imagefs.interact(
-				inputDefinition.image,
-				inputDefinition.partition,
-				function(_fs) {
-					const readFileAsync = Promise.promisify(_fs.readFile);
-					const writeFileAsync = Promise.promisify(_fs.writeFile);
-					return readFileAsync(inputDefinition.path, { encoding: 'utf8' })
-						.then(contents => writeFileAsync(outputDefinition.path, contents));
-			});
-		}
-
-		// In case there's no file at all (shouldn't happen normally, but the file might have been removed)
-		const definition = utils.definitionForImage(target, getConfigPathDefinition(manifest, `${CONNECTIONS_FOLDER}/resin-wifi`));
-		return imagefs.interact(
-			definition.image,
-			definition.partition,
-			function(_fs) {
-				const writeFileAsync = Promise.promisify(_fs.writeFile);
-				return writeFileAsync(definition.path, DEFAULT_CONNECTION_FILE);
+					return writeFileAsync(definition.path, DEFAULT_CONNECTION_FILE);
+				},
+			);
 		});
-	});
 };
 
 // Taken from https://goo.gl/kr1kCt
-var DEFAULT_CONNECTION_FILE = `\
+const DEFAULT_CONNECTION_FILE = `\
 [connection]
 id=resin-wifi
 type=wifi
@@ -219,7 +293,10 @@ addr-gen-mode=stable-privacy
 method=auto\
 `;
 
-var getOS1ConfigurationSchema = function(manifest, answers) {
+const getOS1ConfigurationSchema = function (
+	manifest: DeviceTypeJsonWithConfiguration,
+	answers: Record<string, any>,
+) {
 	// We could switch between schemas using `choice`, but right now that has different semantics, where
 	// it wipes the whole of the rest of the file, whereas using a fixed schema does not. We should
 	// handle this nicer when we move to rust reconfix.
@@ -230,121 +307,120 @@ var getOS1ConfigurationSchema = function(manifest, answers) {
 	}
 };
 
-var getOS1EthernetConfiguration = manifest => ({
+const getOS1EthernetConfiguration = (
+	manifest: DeviceTypeJsonWithConfiguration,
+) => ({
 	mapper: [
 		{
 			// This is a hack - if we don't specify any mapping for config.json, then
 			// the next mapping wipes it completely, leaving only the `files` block.
 			// `files` here is used just because it's safe - we're about to overwrite it.
-			domain: [
-				[ 'config_json', 'files' ]
-			],
+			domain: [['config_json', 'files']],
 			template: {
-				'files': {}
-			}
+				files: {},
+			},
 		},
 		{
-			domain: [
-				[ 'network_config', 'service_home_ethernet' ]
-			],
+			domain: [['network_config', 'service_home_ethernet']],
 			template: {
-				'service_home_ethernet': {
-					'Type': 'ethernet',
-					'Nameservers': '8.8.8.8,8.8.4.4'
-				}
-			}
-		}
-	],
-
-	files: {
-		config_json: {
-			type: 'json',
-			location:
-				getConfigPathDefinition(manifest, '/config.json')
-		},
-		network_config: {
-			type: 'ini',
-			location: {
-				parent: 'config_json',
-				property: [ 'files', 'network/network.config' ]
-			}
-		}
-	}
-});
-
-var getOS1WifiConfigurationSchema = manifest => ({
-	mapper: [
-		{
-			domain: [
-				[ 'config_json', 'wifiSsid' ],
-				[ 'config_json', 'wifiKey' ]
-			],
-			template: {
-				'wifiSsid': '{{wifiSsid}}',
-				'wifiKey': '{{wifiKey}}'
-			}
-		},
-		{
-			domain: [
-				[ 'network_config', 'service_home_ethernet' ],
-				[ 'network_config', 'service_home_wifi' ]
-			],
-			template: {
-				'service_home_ethernet': {
-					'Type': 'ethernet',
-					'Nameservers': '8.8.8.8,8.8.4.4'
+				service_home_ethernet: {
+					Type: 'ethernet',
+					Nameservers: '8.8.8.8,8.8.4.4',
 				},
-				'service_home_wifi': {
-					'Hidden': true,
-					'Type': 'wifi',
-					'Name': '{{wifiSsid}}',
-					'Passphrase': '{{wifiKey}}',
-					'Nameservers': '8.8.8.8,8.8.4.4'
-				}
-			}
-		}
+			},
+		},
 	],
 
 	files: {
 		config_json: {
 			type: 'json',
-			location:
-				getConfigPathDefinition(manifest, '/config.json')
+			location: getConfigPathDefinition(manifest, '/config.json'),
 		},
 		network_config: {
 			type: 'ini',
 			location: {
 				parent: 'config_json',
-				property: [ 'files', 'network/network.config' ]
-			}
-		}
-	}
+				property: ['files', 'network/network.config'],
+			},
+		},
+	},
 });
 
-var getOS2WifiConfigurationSchema = manifest => ({
+const getOS1WifiConfigurationSchema = (
+	manifest: DeviceTypeJsonWithConfiguration,
+) => ({
 	mapper: [
 		{
 			domain: [
-				[ 'system_connections', 'resin-wifi', 'wifi' ],
-				[ 'system_connections', 'resin-wifi', 'wifi-security' ]
+				['config_json', 'wifiSsid'],
+				['config_json', 'wifiKey'],
 			],
 			template: {
-				'wifi': {
-					'ssid': '{{wifiSsid}}'
+				wifiSsid: '{{wifiSsid}}',
+				wifiKey: '{{wifiKey}}',
+			},
+		},
+		{
+			domain: [
+				['network_config', 'service_home_ethernet'],
+				['network_config', 'service_home_wifi'],
+			],
+			template: {
+				service_home_ethernet: {
+					Type: 'ethernet',
+					Nameservers: '8.8.8.8,8.8.4.4',
+				},
+				service_home_wifi: {
+					Hidden: true,
+					Type: 'wifi',
+					Name: '{{wifiSsid}}',
+					Passphrase: '{{wifiKey}}',
+					Nameservers: '8.8.8.8,8.8.4.4',
+				},
+			},
+		},
+	],
+
+	files: {
+		config_json: {
+			type: 'json',
+			location: getConfigPathDefinition(manifest, '/config.json'),
+		},
+		network_config: {
+			type: 'ini',
+			location: {
+				parent: 'config_json',
+				property: ['files', 'network/network.config'],
+			},
+		},
+	},
+});
+
+const getOS2WifiConfigurationSchema = (
+	manifest: DeviceTypeJsonWithConfiguration,
+) => ({
+	mapper: [
+		{
+			domain: [
+				['system_connections', 'resin-wifi', 'wifi'],
+				['system_connections', 'resin-wifi', 'wifi-security'],
+			],
+			template: {
+				wifi: {
+					ssid: '{{wifiSsid}}',
 				},
 				'wifi-security': {
-					'psk': '{{wifiKey}}'
-				}
-			}
-		}
+					psk: '{{wifiKey}}',
+				},
+			},
+		},
 	],
 
 	files: {
 		system_connections: {
 			fileset: true,
 			type: 'ini',
-			location:
-				getConfigPathDefinition(manifest, CONNECTIONS_FOLDER)
-		}
-	}
+			location: getConfigPathDefinition(manifest, CONNECTIONS_FOLDER),
+		},
+	},
 });

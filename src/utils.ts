@@ -14,13 +14,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-let convertFilePathDefinition, definitionForImage;
-const Promise = require('bluebird');
-const _ = require('lodash');
-const rindle = Promise.promisifyAll(require('rindle'));
-const path = require('path');
-const stringToStream = require('string-to-stream');
-const imagefs = require('balena-image-fs');
+import Promise from 'bluebird';
+import _ from 'lodash';
+import type * as fsPromise from 'fs/promises';
+import path from 'path';
+import * as imagefs from 'balena-image-fs';
+import type {
+	DeviceTypeConfigurationConfig,
+	DeviceTypeJson,
+} from './device-type-json';
 
 /**
  * @summary Get device type manifest of an image
@@ -33,17 +35,24 @@ const imagefs = require('balena-image-fs');
  * utils.getImageManifest('path/to/image.img', 'raspberry-pi').then (manifest) ->
  * 	console.log(manifest)
  */
-exports.getImageManifest = image => // Attempt to read manifest from the first
-// partition, but fallback to the API if
-// we encounter any errors along the way.
-Promise.resolve(imagefs.interact(
-    image,
-    1,
-    function(_fs) {
-        const readFileAsync = Promise.promisify(_fs.readFile);
-        return readFileAsync('/device-type.json', { encoding: 'utf8' });
-})).then(JSON.parse)
-.catchReturn(null);
+export function getImageManifest(
+	image: string,
+): Promise<DeviceTypeJson | null> {
+	// Attempt to read manifest from the first
+	// partition, but fallback to the API if
+	// we encounter any errors along the way.
+	return Promise.resolve(
+		imagefs.interact(image, 1, function (_fs) {
+			const readFileAsync = Promise.promisify(_fs.readFile);
+			// @ts-expect-error TODO: Change to use node's util.promisify to fix the typings
+			return readFileAsync('/device-type.json', {
+				encoding: 'utf8',
+			}) as Promise<string>;
+		}),
+	)
+		.then(JSON.parse)
+		.catchReturn(null);
+}
 
 /**
  * @summary Convert a device type file definition to resin-image-fs v4 format
@@ -61,23 +70,25 @@ Promise.resolve(imagefs.interact(
  * 		logical: 1
  * 	path: '/config.json'
  */
-exports.convertFilePathDefinition = (convertFilePathDefinition = function(inputDefinition) {
+export function convertFilePathDefinition<
+	T extends Pick<DeviceTypeConfigurationConfig, 'partition'>,
+>(
+	inputDefinition: T,
+): Omit<T, 'partition'> & { partition: number | undefined } {
 	const definition = _.cloneDeep(inputDefinition);
 
-	if (_.isObject(definition.partition)) {
-		// Partition numbering is now numerical, following the linux
-		// conventions in 5.95 of the TLDP's system admin guide:
-		// http://www.tldp.org/LDP/sag/html/partitions.html#DEV-FILES-PARTS
-		if (definition.partition.logical != null) {
-			definition.partition = definition.partition.logical + 4;
-		} else {
-			definition.partition = definition.partition.primary;
-		}
-	}
-
-	return definition;
-});
-
+	return {
+		...definition,
+		partition: _.isObject(definition.partition)
+			? // Partition numbering is now numerical, following the linux
+				// conventions in 5.95 of the TLDP's system admin guide:
+				// http://www.tldp.org/LDP/sag/html/partitions.html#DEV-FILES-PARTS
+				definition.partition.logical != null
+				? definition.partition.logical + 4
+				: (definition.partition = definition.partition.primary)
+			: definition.partition,
+	};
+}
 
 /**
  * @summary Add image info to a device type config definition
@@ -96,20 +107,21 @@ exports.convertFilePathDefinition = (convertFilePathDefinition = function(inputD
  * 		logical: 1
  * 	path: '/config.json'
  */
-exports.definitionForImage = (definitionForImage = function(image, configDefinition) {
+export function definitionForImage<
+	T extends Pick<DeviceTypeConfigurationConfig, 'image' | 'partition'>,
+>(image: string, configDefinition: T): T & { image: string } {
 	configDefinition = _.cloneDeep(configDefinition);
 
-	if (configDefinition.image != null) {
-		// Sometimes (e.g. edison) our 'image' is a folder of images, and the
-		// config specifies which one within that we should be using
-		configDefinition.image = path.join(image, configDefinition.image);
-	} else {
-		configDefinition.image = image;
-	}
-
-	return configDefinition;
-});
-
+	return {
+		...configDefinition,
+		image:
+			configDefinition.image != null
+				? // Sometimes (e.g. edison) our 'image' is a folder of images, and the
+					// config specifies which one within that we should be using
+					path.join(image, configDefinition.image)
+				: image,
+	};
+}
 
 /**
  * @summary Get image OS version
@@ -123,48 +135,63 @@ exports.definitionForImage = (definitionForImage = function(image, configDefinit
  * utils.getImageOsVersion('path/to/image.img', manifest).then (version) ->
  * 	console.log(version)
  */
-exports.getImageOsVersion = function(image, manifest) {
+export function getImageOsVersion(
+	image: string,
+	manifest: DeviceTypeJson | undefined,
+): Promise<string | null> {
 	// Try to determine the location where os-release is stored. This is always
 	// stored alongside "config.json" so look into the manifest if given, and
 	// fallback to a sensible default if not. This should be able to handle a
 	// wide range of regular images with several partitions as well as cases like
 	// with Edison where "image" points to a folder structure.
-	let definition = (manifest != null ? manifest.configuration.config : undefined) != null ? (manifest != null ? manifest.configuration.config : undefined) : { partition: 1 };
-	definition = definitionForImage(image, definition);
-	definition = convertFilePathDefinition(definition);
-	definition.path = '/os-release';
+
+	const definition = {
+		...convertFilePathDefinition(
+			definitionForImage(
+				image,
+				manifest?.configuration?.config ?? { partition: 1 },
+			),
+		),
+		path: '/os-release',
+	};
 
 	return Promise.resolve(
-		imagefs.interact(
-			definition.image,
-			definition.partition,
-			function(_fs) {
-				const readFileAsync = Promise.promisify(_fs.readFile);
-				return readFileAsync(definition.path, { encoding: 'utf8' });
-		})
+		imagefs.interact(definition.image, definition.partition, function (_fs) {
+			const readFileAsync = Promise.promisify(
+				_fs.readFile,
+			) as typeof fsPromise.readFile;
+			return readFileAsync(definition.path, { encoding: 'utf8' });
+		}),
 	)
-	.then(function(osReleaseString) {
-		const parsedOsRelease = _(osReleaseString)
-			.split('\n')
-			.map(function(line) {
-				const match = line.match(/(.*)=(.*)/);
-				if (match) {
-					return [
-						match[1],
-						match[2].replace(/^"(.*)"$/, '$1').replace(/^'(.*)'$/, '$1')
-					];
-				} else {
-					return false;
-				}}).filter()
-			.fromPairs()
-			.value();
+		.then(function (osReleaseString) {
+			const parsedOsRelease = _(osReleaseString)
+				.split('\n')
+				.map(function (line) {
+					const match = line.match(/(.*)=(.*)/);
+					if (match) {
+						return [
+							match[1],
+							match[2].replace(/^"(.*)"$/, '$1').replace(/^'(.*)'$/, '$1'),
+						];
+					} else {
+						return false;
+					}
+				})
+				.filter()
+				.fromPairs()
+				.value();
 
-		if ((parsedOsRelease.NAME !== 'Resin OS') && (parsedOsRelease.NAME !== 'balenaOS')) {
-			return null;
-		} else {
-			return parsedOsRelease.VERSION || null;
-		}}).catchReturn(null);
-};
+			if (
+				parsedOsRelease.NAME !== 'Resin OS' &&
+				parsedOsRelease.NAME !== 'balenaOS'
+			) {
+				return null;
+			} else {
+				return parsedOsRelease.VERSION || null;
+			}
+		})
+		.catchReturn(null);
+}
 
 /**
  * @summary Write config.json to image
@@ -173,7 +200,7 @@ exports.getImageOsVersion = function(image, manifest) {
  *
  * @param {String} image - image path
  * @param {Object} config - config.json object
- * @param {Object} definition - write definition
+ * @param {Object} definitionWithImage - write definition
  *
  * @returns {Promise}
  *
@@ -186,16 +213,21 @@ exports.getImageOsVersion = function(image, manifest) {
  * 		logical: 1
  * 	path: '/config.json'
  */
-exports.writeConfigJSON = function(image, config, definition) {
-	config = JSON.stringify(config);
+export const writeConfigJSON = function (
+	image: string,
+	config: Record<string, any>,
+	definition: { partition: number | undefined; path: string },
+) {
+	const serializedConfig = JSON.stringify(config);
 
-	definition = exports.definitionForImage(image, definition);
+	const definitionWithImage = definitionForImage(image, definition);
 
 	return imagefs.interact(
-		definition.image,
-		definition.partition,
-		function(_fs) {
+		definitionWithImage.image,
+		definitionWithImage.partition,
+		function (_fs) {
 			const writeFileAsync = Promise.promisify(_fs.writeFile);
-			return writeFileAsync(definition.path, config);
-	});
+			return writeFileAsync(definitionWithImage.path, serializedConfig);
+		},
+	);
 };

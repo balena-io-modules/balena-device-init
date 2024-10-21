@@ -18,15 +18,75 @@ limitations under the License.
  * @module init
  */
 
-const _ = require('lodash');
-const Promise = require('bluebird');
-const operations = require('resin-device-operations');
-const resinSemver = require('balena-semver');
-const utils = require('./utils');
-const network = require('./network');
+import _ from 'lodash';
+import Promise from 'bluebird';
+import * as operations from 'resin-device-operations';
+import * as balenaSemver from 'balena-semver';
+import * as utils from './utils';
+import * as network from './network';
+import type { DeviceTypeJson } from './device-type-json';
 
-exports.getImageManifest = utils.getImageManifest;
-exports.getImageOsVersion = utils.getImageOsVersion;
+export { getImageManifest, getImageOsVersion } from './utils';
+
+export interface OperationState {
+	operation:
+		| CopyOperation
+		| ReplaceOperation
+		| RunScriptOperation
+		| BurnOperation;
+	percentage: number;
+}
+
+export interface Operation {
+	command: string;
+}
+
+export interface CopyOperation extends Operation {
+	command: 'copy';
+	from: { path: string };
+	to: { path: string };
+}
+
+export interface ReplaceOperation extends Operation {
+	command: 'replace';
+	copy: string;
+	replace: string;
+	file: {
+		path: string;
+	};
+}
+
+export interface RunScriptOperation extends Operation {
+	command: 'run-script';
+	script: string;
+	arguments?: string[];
+}
+
+export interface BurnOperation extends Operation {
+	command: 'burn';
+	image?: string;
+}
+
+export interface BurnProgress {
+	type: 'write' | 'check';
+	percentage: number;
+	transferred: number;
+	length: number;
+	remaining: number;
+	eta: number;
+	runtime: number;
+	delta: number;
+	speed: number;
+}
+
+export interface InitializeEmitter {
+	on(event: 'stdout' | 'stderr', callback: (msg: string) => void): void;
+	on(event: 'state', callback: (state: OperationState) => void): void;
+	on(event: 'burn', callback: (state: BurnProgress) => void): void;
+	on(event: 'end', callback: () => void): void;
+	on(event: 'close', callback: () => void): void;
+	on(event: 'error', callback: (error: Error) => void): void;
+}
 
 /**
  * @summary Configure an image with an application
@@ -59,34 +119,72 @@ exports.getImageOsVersion = utils.getImageOsVersion;
  * 	configuration.on 'end', ->
  * 		console.log('Configuration finished')
  */
-exports.configure = function(image, manifest, config, options) {
-	if (options == null) { options = {}; }
-	return Promise.try(function() {
+export function configure(
+	image: string,
+	manifest: DeviceTypeJson,
+	config: Record<string, any>,
+	options: object = {},
+): Promise<InitializeEmitter> {
+	return Promise.try(function () {
 		// We only know how to find /etc/os-release on specific types of OS image. In future, we'd like to be able
 		// to do this for any image, but for now we'll just treat others as unknowable (which means below we'll
 		// configure the network to work for _either_ OS version.
-		if (((manifest.yocto != null ? manifest.yocto.image : undefined) === 'resin-image') && _.includes(['resinos-img', 'resin-sdcard'], manifest.yocto != null ? manifest.yocto.fstype : undefined)) {
+		if (
+			manifest.yocto?.image === 'resin-image' &&
+			_.includes(['resinos-img', 'resin-sdcard'], manifest.yocto?.fstype)
+		) {
 			return utils.getImageOsVersion(image, manifest);
-		}}).then(function(osVersion) {
-		const {
-				configuration
-		} = manifest;
+		}
+	}).then(function (osVersion) {
+		if (manifest.configuration == null) {
+			throw new Error(
+				'Unsupported device type: Manifest missing configuration parameters',
+			);
+		}
 
-		const majorVersion = resinSemver.major(osVersion);
+		const { configuration } = manifest;
+		// TS should be able to detect this on its own and we shoulnd't have to do it manually
+		const manifestWithConfiguration = manifest as typeof manifest & {
+			configuration: object;
+		};
 
-		const configPathDefinition = utils.convertFilePathDefinition(configuration.config);
-		return utils.writeConfigJSON(image, config, configPathDefinition)
-		.then(function() {
-			// Configure for OS2 if it is OS2, or if we're just not sure
-			if ((majorVersion == null) || (majorVersion === 2)) {
-				return network.configureOS2Network(image, manifest, options);
-			}}).then(function() {
-			// Configure for OS1 if it is OS1, or if we're just not sure
-			if ((majorVersion == null) || (majorVersion === 1)) {
-				return network.configureOS1Network(image, manifest, options);
-			}}).then(() => operations.execute(image, configuration.operations, options));
+		const majorVersion = balenaSemver.major(osVersion);
+
+		const configPathDefinition = utils.convertFilePathDefinition(
+			configuration.config,
+		);
+		return utils
+			.writeConfigJSON(image, config, configPathDefinition)
+			.then(function () {
+				// Configure for OS2 if it is OS2, or if we're just not sure
+				if (majorVersion == null || majorVersion === 2) {
+					return network.configureOS2Network(
+						image,
+						manifestWithConfiguration,
+						options,
+					);
+				}
+			})
+			.then(function () {
+				// Configure for OS1 if it is OS1, or if we're just not sure
+				if (majorVersion == null || majorVersion === 1) {
+					return network.configureOS1Network(
+						image,
+						manifestWithConfiguration,
+						options,
+					);
+				}
+			})
+			.then(() =>
+				operations.execute(
+					image,
+					// @ts-expect-error TODO: Check whether this should be `manifest.initialization.operations` ?
+					configuration.operations,
+					options,
+				),
+			);
 	});
-};
+}
 
 /**
  * @summary Initialize an image
@@ -118,4 +216,15 @@ exports.configure = function(image, manifest, config, options) {
  * 	configuration.on 'end', ->
  * 		console.log('Configuration finished')
  */
-exports.initialize = (image, manifest, options) => operations.execute(image, manifest.initialization.operations, options);
+export function initialize(
+	image: string,
+	manifest: DeviceTypeJson,
+	options: object,
+): Promise<InitializeEmitter> {
+	if (manifest.initialization == null) {
+		throw new Error(
+			'Unsupported device type: Manifest missing initialization parameters',
+		);
+	}
+	return operations.execute(image, manifest.initialization.operations, options);
+}
