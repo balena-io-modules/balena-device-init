@@ -8,6 +8,10 @@
     "type": "git",
     "url": "git://github.com/balena-io/balena-device-init.git"
   },
+  "files": [
+    "build/",
+    "typings/"
+  ],
   "keywords": [
     "balena",
     "device",
