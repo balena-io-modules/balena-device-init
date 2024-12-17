@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "module": "node16",
+        "target": "es2021",
+        "declaration": true,
+        "outDir": "build",
+        "removeComments": false,
+        "strict": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "sourceMap": false,
+        "skipLibCheck": true,
+        "esModuleInterop": true,
+        "importHelpers": true
+    },
+    "include": [
+        "src/**/*",
+        "typings/*.d.ts"
+    ]
+}
