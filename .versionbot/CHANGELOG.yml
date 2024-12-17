@@ -1,4 +1,24 @@
 - commits:
+    - subject: "flowzone: Update runner versions"
+      hash: ba1222ac43ca13b720b64d18129193be8b99af5b
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Thodoris Greasidis
+      nested: []
+    - subject: Pin etcher-sdk to 9.0.8 to match resin-device-operations and fix tests
+      hash: 65cde1b940b7bdcc64d34534afa4d9b7b1d14303
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Thodoris Greasidis
+      nested: []
+  version: 7.0.2
+  title: ""
+  date: 2024-12-17T20:16:06.532Z
+- commits:
     - subject: Remove the .hound.yml
       hash: 4de5b2250ab9d3e8c390428c35d95a410c35cdbe
       body: ""
