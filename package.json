@@ -23,9 +23,10 @@
     "test": "tests"
   },
   "scripts": {
-    "build": "tsc && npm run readme",
+    "build": "tsc && npm run lint && npm run readme",
     "test": "([ \"$GITHUB_WORKFLOW\" = 'Flowzone' ] && [ \"$GITHUB_JOB\" = 'npm_test' ] && echo \"Skipping 'npm test' in flowzone in favor of the custom test action!\") || (npm run build && npm run test:all)",
-    "test:all": "npm run lint && ts-mocha --project ./tsconfig.dev.json --paths tests/e2e.ts",
+    "test:all": "ts-mocha --project ./tsconfig.dev.json --paths tests/e2e.ts",
+    "test:ci": "tsc && npm run test:all",
     "lint": "balena-lint -e ts src tests -t tsconfig.dev.json",
     "lint-fix": "balena-lint -e ts src tests --fix -t tsconfig.dev.json",
     "readme": "jsdoc2md --template doc/README.hbs build/init.js > README.md"
