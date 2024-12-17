@@ -19,7 +19,6 @@ limitations under the License.
  */
 
 import _ from 'lodash';
-import Promise from 'bluebird';
 import * as operations from 'resin-device-operations';
 import * as balenaSemver from 'balena-semver';
 import * as utils from './utils';
@@ -119,71 +118,66 @@ export interface InitializeEmitter {
  * 	configuration.on 'end', ->
  * 		console.log('Configuration finished')
  */
-export function configure(
+export async function configure(
 	image: string,
 	manifest: DeviceTypeJson,
 	config: Record<string, any>,
 	options: object = {},
 ): Promise<InitializeEmitter> {
-	return Promise.try(function () {
-		// We only know how to find /etc/os-release on specific types of OS image. In future, we'd like to be able
-		// to do this for any image, but for now we'll just treat others as unknowable (which means below we'll
-		// configure the network to work for _either_ OS version.
-		if (
-			manifest.yocto?.image === 'resin-image' &&
-			_.includes(['resinos-img', 'resin-sdcard'], manifest.yocto?.fstype)
-		) {
-			return utils.getImageOsVersion(image, manifest);
-		}
-	}).then(function (osVersion) {
-		if (manifest.configuration == null) {
-			throw new Error(
-				'Unsupported device type: Manifest missing configuration parameters',
-			);
-		}
+	// We only know how to find /etc/os-release on specific types of OS image. In future, we'd like to be able
+	// to do this for any image, but for now we'll just treat others as unknowable (which means below we'll
+	// configure the network to work for _either_ OS version.
+	let osVersion: string | null = null;
+	if (
+		manifest.yocto?.image === 'resin-image' &&
+		_.includes(['resinos-img', 'resin-sdcard'], manifest.yocto?.fstype)
+	) {
+		osVersion = await utils.getImageOsVersion(image, manifest);
+	}
 
-		const { configuration } = manifest;
-		// TS should be able to detect this on its own and we shoulnd't have to do it manually
-		const manifestWithConfiguration = manifest as typeof manifest & {
-			configuration: object;
-		};
-
-		const majorVersion = balenaSemver.major(osVersion);
-
-		const configPathDefinition = utils.convertFilePathDefinition(
-			configuration.config,
+	if (manifest.configuration == null) {
+		throw new Error(
+			'Unsupported device type: Manifest missing configuration parameters',
 		);
-		return utils
-			.writeConfigJSON(image, config, configPathDefinition)
-			.then(function () {
-				// Configure for OS2 if it is OS2, or if we're just not sure
-				if (majorVersion == null || majorVersion === 2) {
-					return network.configureOS2Network(
-						image,
-						manifestWithConfiguration,
-						options,
-					);
-				}
-			})
-			.then(function () {
-				// Configure for OS1 if it is OS1, or if we're just not sure
-				if (majorVersion == null || majorVersion === 1) {
-					return network.configureOS1Network(
-						image,
-						manifestWithConfiguration,
-						options,
-					);
-				}
-			})
-			.then(() =>
-				operations.execute(
-					image,
-					// @ts-expect-error TODO: Check whether this should be `manifest.initialization.operations` ?
-					configuration.operations,
-					options,
-				),
-			);
-	});
+	}
+
+	const { configuration } = manifest;
+	// TS should be able to detect this on its own and we shoulnd't have to do it manually
+	const manifestWithConfiguration = manifest as typeof manifest & {
+		configuration: object;
+	};
+
+	const majorVersion = balenaSemver.major(osVersion);
+
+	const configPathDefinition = utils.convertFilePathDefinition(
+		configuration.config,
+	);
+	await utils.writeConfigJSON(image, config, configPathDefinition);
+
+	// Configure for OS2 if it is OS2, or if we're just not sure
+	if (majorVersion == null || majorVersion === 2) {
+		await network.configureOS2Network(
+			image,
+			manifestWithConfiguration,
+			options,
+		);
+	}
+
+	// Configure for OS1 if it is OS1, or if we're just not sure
+	if (majorVersion == null || majorVersion === 1) {
+		await network.configureOS1Network(
+			image,
+			manifestWithConfiguration,
+			options,
+		);
+	}
+
+	return await operations.execute(
+		image,
+		// @ts-expect-error TODO: Check whether this should be `manifest.initialization.operations` ?
+		configuration.operations,
+		options,
+	);
 }
 
 /**
@@ -216,7 +210,7 @@ export function configure(
  * 	configuration.on 'end', ->
  * 		console.log('Configuration finished')
  */
-export function initialize(
+export async function initialize(
 	image: string,
 	manifest: DeviceTypeJson,
 	options: object,
@@ -226,5 +220,9 @@ export function initialize(
 			'Unsupported device type: Manifest missing initialization parameters',
 		);
 	}
-	return operations.execute(image, manifest.initialization.operations, options);
+	return await operations.execute(
+		image,
+		manifest.initialization.operations,
+		options,
+	);
 }

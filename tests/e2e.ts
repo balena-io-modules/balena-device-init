@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import * as fsPromise from 'fs/promises';
 import * as fs from 'fs';
 import path from 'path';
-import Promise from 'bluebird';
+import * as util from 'node:util';
 import wary from 'wary';
 
 import * as settings from 'balena-settings-client';
@@ -73,9 +73,7 @@ wary.it(
 			.then(waitStream)
 			.then(() =>
 				imagefs.interact(images.raspberrypi, 1, function (_fs) {
-					const readFileAsync = Promise.promisify(
-						_fs.readFile,
-					) as typeof fsPromise.readFile;
+					const readFileAsync = util.promisify(_fs.readFile);
 					return readFileAsync('/config.json', { encoding: 'utf8' });
 				}),
 			)
@@ -103,9 +101,7 @@ wary.it(
 			.then(waitStream)
 			.then(() =>
 				imagefs.interact(images.raspberrypi, 5, function (_fs) {
-					const readFileAsync = Promise.promisify(
-						_fs.readFile,
-					) as typeof fsPromise.readFile;
+					const readFileAsync = util.promisify(_fs.readFile);
 					return readFileAsync('/config.json', { encoding: 'utf8' });
 				}),
 			)
@@ -134,9 +130,7 @@ wary.it(
 			.then(waitStream)
 			.then(() =>
 				imagefs.interact(images.raspberrypi, 1, function (_fs) {
-					const readFileAsync = Promise.promisify(
-						_fs.readFile,
-					) as typeof fsPromise.readFile;
+					const readFileAsync = util.promisify(_fs.readFile);
 					return readFileAsync('/config.json', { encoding: 'utf8' });
 				}),
 			)
@@ -175,9 +169,7 @@ wary.it(
 			.then(waitStream)
 			.then(() =>
 				imagefs.interact(images.raspberrypi, 1, function (_fs) {
-					const readFileAsync = Promise.promisify(
-						_fs.readFile,
-					) as typeof fsPromise.readFile;
+					const readFileAsync = util.promisify(_fs.readFile);
 					return readFileAsync('/system-connections/resin-wifi', {
 						encoding: 'utf8',
 					});
@@ -278,14 +270,13 @@ wary.it(
 				),
 			)
 			.then(waitStream)
-			.then(() =>
-				Promise.props({
-					raspberrypi: fsPromise.readFile(images.raspberrypi),
-					random: fsPromise.readFile(images.random),
-				}).then((results) =>
-					expect(results.random).to.deep.equal(results.raspberrypi),
-				),
-			);
+			.then(async () => {
+				const [raspberrypi, random] = await Promise.all([
+					fsPromise.readFile(images.raspberrypi),
+					fsPromise.readFile(images.random),
+				]);
+				expect(random).to.deep.equal(raspberrypi);
+			});
 	},
 );
 
@@ -312,14 +303,13 @@ wary.it(
 				),
 			)
 			.then(waitStream)
-			.then(() =>
-				Promise.props({
-					raspberrypi: fsPromise.readFile(images.raspberrypi),
-					random: fsPromise.readFile(images.random),
-				}).then((results) =>
-					expect(results.random).to.deep.equal(results.raspberrypi),
-				),
-			);
+			.then(async () => {
+				const [raspberrypi, random] = await Promise.all([
+					fsPromise.readFile(images.raspberrypi),
+					fsPromise.readFile(images.random),
+				]);
+				expect(random).to.deep.equal(raspberrypi);
+			});
 	},
 );
 
@@ -418,9 +408,7 @@ wary.it(
 					path.join(images.edison, 'resin-image-edison.hddimg'),
 					undefined,
 					function (_fs) {
-						const readFileAsync = Promise.promisify(
-							_fs.readFile,
-						) as typeof fsPromise.readFile;
+						const readFileAsync = util.promisify(_fs.readFile);
 						return readFileAsync('/config.json', { encoding: 'utf8' });
 					},
 				),
@@ -482,25 +470,22 @@ wary.it(
 	},
 );
 
-Promise.try(async () => (await import('dotenv')).config({ silent: true }))
-	.then(() =>
-		sdk.auth.login({
+void (async () => {
+	try {
+		(await import('dotenv')).config({ silent: true });
+		await sdk.auth.login({
 			email: process.env.TEST_EMAIL!,
 			password: process.env.TEST_PASSWORD!,
-		}),
-	)
-	.then(function () {
-		console.log('Logged in');
-		return Promise.props({
-			raspberrypi: prepareDevice('raspberry-pi'),
-			edison: prepareDevice('intel-edison'),
 		});
-	})
-	.then(function (devices) {
-		DEVICES = devices;
-		return wary.run();
-	})
-	.catch(function (error) {
+		console.log('Logged in');
+		const [raspberrypi, edison] = await Promise.all([
+			prepareDevice('raspberry-pi'),
+			prepareDevice('intel-edison'),
+		]);
+		DEVICES = { raspberrypi, edison };
+		await wary.run();
+	} catch (error) {
 		console.error(error, error.stack);
 		return process.exit(1);
-	});
+	}
+})();

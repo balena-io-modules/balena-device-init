@@ -14,10 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import Promise from 'bluebird';
 import _ from 'lodash';
-import type * as fsPromise from 'fs/promises';
 import path from 'path';
+import * as util from 'node:util';
 import * as imagefs from 'balena-image-fs';
 import type {
 	DeviceTypeConfigurationConfig,
@@ -43,15 +42,14 @@ export function getImageManifest(
 	// we encounter any errors along the way.
 	return Promise.resolve(
 		imagefs.interact(image, 1, function (_fs) {
-			const readFileAsync = Promise.promisify(_fs.readFile);
-			// @ts-expect-error TODO: Change to use node's util.promisify to fix the typings
+			const readFileAsync = util.promisify(_fs.readFile);
 			return readFileAsync('/device-type.json', {
 				encoding: 'utf8',
-			}) as Promise<string>;
+			});
 		}),
 	)
 		.then(JSON.parse)
-		.catchReturn(null);
+		.catch(() => null);
 }
 
 /**
@@ -157,9 +155,7 @@ export function getImageOsVersion(
 
 	return Promise.resolve(
 		imagefs.interact(definition.image, definition.partition, function (_fs) {
-			const readFileAsync = Promise.promisify(
-				_fs.readFile,
-			) as typeof fsPromise.readFile;
+			const readFileAsync = util.promisify(_fs.readFile);
 			return readFileAsync(definition.path, { encoding: 'utf8' });
 		}),
 	)
@@ -190,7 +186,7 @@ export function getImageOsVersion(
 				return parsedOsRelease.VERSION || null;
 			}
 		})
-		.catchReturn(null);
+		.catch(() => null);
 }
 
 /**
@@ -226,7 +222,7 @@ export const writeConfigJSON = function (
 		definitionWithImage.image,
 		definitionWithImage.partition,
 		function (_fs) {
-			const writeFileAsync = Promise.promisify(_fs.writeFile);
+			const writeFileAsync = util.promisify(_fs.writeFile);
 			return writeFileAsync(definitionWithImage.path, serializedConfig);
 		},
 	);

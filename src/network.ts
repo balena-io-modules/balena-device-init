@@ -19,11 +19,10 @@ limitations under the License.
  */
 
 import _ from 'lodash';
-import type * as fsPromise from 'fs/promises';
 import path from 'path';
+import * as util from 'node:util';
 import * as imagefs from 'balena-image-fs';
 import reconfix from 'reconfix';
-import Promise from 'bluebird';
 import * as utils from './utils';
 import type { DeviceTypeJsonWithConfiguration } from './device-type-json';
 
@@ -122,16 +121,17 @@ const prepareImageOS1NetworkConfig = function (
 		configFilePath.image,
 		configFilePath.partition,
 		function (_fs) {
-			const readFileAsync = Promise.promisify(
-				_fs.readFile,
-			) as typeof fsPromise.readFile;
-			const writeFileAsync = Promise.promisify(_fs.writeFile);
-			return (
-				readFileAsync(configFilePath.path, {
-					encoding: 'utf8',
-				}) as Promise<string>
-			)
-				.catch(fileNotFoundError, () => '{}')
+			const readFileAsync = util.promisify(_fs.readFile);
+			const writeFileAsync = util.promisify(_fs.writeFile);
+			return readFileAsync(configFilePath.path, {
+				encoding: 'utf8',
+			})
+				.catch((e) => {
+					if (fileNotFoundError(e)) {
+						return '{}';
+					}
+					throw e;
+				})
 				.then(JSON.parse)
 				.then(function (contents) {
 					if (contents.files == null) {
@@ -181,10 +181,8 @@ const prepareImageOS2WifiConfig = function (
 			connectionsFolderDefinition.image,
 			connectionsFolderDefinition.partition,
 			function (_fs) {
-				const readdirAsync = Promise.promisify(_fs.readdir);
-				return readdirAsync(connectionsFolderDefinition.path) as Promise<
-					string[]
-				>;
+				const readdirAsync = util.promisify(_fs.readdir);
+				return readdirAsync(connectionsFolderDefinition.path);
 			},
 		)
 		.then(function (files) {
@@ -210,10 +208,8 @@ const prepareImageOS2WifiConfig = function (
 					inputDefinition.image,
 					inputDefinition.partition,
 					function (_fs) {
-						const readFileAsync = Promise.promisify(
-							_fs.readFile,
-						) as typeof fsPromise.readFile;
-						const writeFileAsync = Promise.promisify(_fs.writeFile);
+						const readFileAsync = util.promisify(_fs.readFile);
+						const writeFileAsync = util.promisify(_fs.writeFile);
 						return readFileAsync(inputDefinition.path, {
 							encoding: 'utf8',
 						}).then((contents) =>
@@ -240,10 +236,8 @@ const prepareImageOS2WifiConfig = function (
 					inputDefinition.image,
 					inputDefinition.partition,
 					function (_fs) {
-						const readFileAsync = Promise.promisify(
-							_fs.readFile,
-						) as typeof fsPromise.readFile;
-						const writeFileAsync = Promise.promisify(_fs.writeFile);
+						const readFileAsync = util.promisify(_fs.readFile);
+						const writeFileAsync = util.promisify(_fs.writeFile);
 						return readFileAsync(inputDefinition.path, {
 							encoding: 'utf8',
 						}).then((contents) =>
@@ -262,7 +256,7 @@ const prepareImageOS2WifiConfig = function (
 				definition.image,
 				definition.partition,
 				function (_fs) {
-					const writeFileAsync = Promise.promisify(_fs.writeFile);
+					const writeFileAsync = util.promisify(_fs.writeFile);
 					return writeFileAsync(definition.path, DEFAULT_CONNECTION_FILE);
 				},
 			);
