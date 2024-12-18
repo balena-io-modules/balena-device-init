@@ -18,6 +18,8 @@ import _ from 'lodash';
 import path from 'path';
 import * as util from 'node:util';
 import * as imagefs from 'balena-image-fs';
+import { getBootPartition } from 'balena-config-json';
+
 import type {
 	DeviceTypeConfigurationConfig,
 	DeviceTypeJson,
@@ -34,22 +36,28 @@ import type {
  * utils.getImageManifest('path/to/image.img', 'raspberry-pi').then (manifest) ->
  * 	console.log(manifest)
  */
-export function getImageManifest(
+export async function getImageManifest(
 	image: string,
 ): Promise<DeviceTypeJson | null> {
-	// Attempt to read manifest from the first
-	// partition, but fallback to the API if
-	// we encounter any errors along the way.
-	return Promise.resolve(
-		imagefs.interact(image, 1, function (_fs) {
-			const readFileAsync = util.promisify(_fs.readFile);
-			return readFileAsync('/device-type.json', {
-				encoding: 'utf8',
-			});
-		}),
-	)
-		.then(JSON.parse)
-		.catch(() => null);
+	// Attempt to find the boot partition from the image
+	// or fallback to the first partition,
+	// and then try to read the manifest.
+	try {
+		const bootPartitionNumber = (await getBootPartition(image)) ?? 1;
+		const manifestString = await imagefs.interact(
+			image,
+			bootPartitionNumber,
+			function (_fs) {
+				const readFileAsync = util.promisify(_fs.readFile);
+				return readFileAsync('/device-type.json', {
+					encoding: 'utf8',
+				});
+			},
+		);
+		return JSON.parse(manifestString);
+	} catch {
+		return null;
+	}
 }
 
 /**
@@ -133,60 +141,68 @@ export function definitionForImage<
  * utils.getImageOsVersion('path/to/image.img', manifest).then (version) ->
  * 	console.log(version)
  */
-export function getImageOsVersion(
+export async function getImageOsVersion(
 	image: string,
 	manifest: DeviceTypeJson | undefined,
 ): Promise<string | null> {
 	// Try to determine the location where os-release is stored. This is always
-	// stored alongside "config.json" so look into the manifest if given, and
+	// stored alongside "config.json" so look into the manifest if given,
+	// or fallback to getting the manifest by inspecting the image, and
 	// fallback to a sensible default if not. This should be able to handle a
 	// wide range of regular images with several partitions as well as cases like
 	// with Edison where "image" points to a folder structure.
+	try {
+		manifest ??= (await getImageManifest(image)) ?? undefined;
 
-	const definition = {
-		...convertFilePathDefinition(
-			definitionForImage(
-				image,
-				manifest?.configuration?.config ?? { partition: 1 },
+		const definition = {
+			...convertFilePathDefinition(
+				definitionForImage(
+					image,
+					manifest?.configuration?.config ?? {
+						partition: (await getBootPartition(image)) ?? 1,
+					},
+				),
 			),
-		),
-		path: '/os-release',
-	};
+			path: '/os-release',
+		};
 
-	return Promise.resolve(
-		imagefs.interact(definition.image, definition.partition, function (_fs) {
-			const readFileAsync = util.promisify(_fs.readFile);
-			return readFileAsync(definition.path, { encoding: 'utf8' });
-		}),
-	)
-		.then(function (osReleaseString) {
-			const parsedOsRelease = _(osReleaseString)
-				.split('\n')
-				.map(function (line) {
-					const match = line.match(/(.*)=(.*)/);
-					if (match) {
-						return [
-							match[1],
-							match[2].replace(/^"(.*)"$/, '$1').replace(/^'(.*)'$/, '$1'),
-						];
-					} else {
-						return false;
-					}
-				})
-				.filter()
-				.fromPairs()
-				.value();
+		const osReleaseString = await imagefs.interact(
+			definition.image,
+			definition.partition,
+			function (_fs) {
+				const readFileAsync = util.promisify(_fs.readFile);
+				return readFileAsync(definition.path, { encoding: 'utf8' });
+			},
+		);
 
-			if (
-				parsedOsRelease.NAME !== 'Resin OS' &&
-				parsedOsRelease.NAME !== 'balenaOS'
-			) {
-				return null;
-			} else {
-				return parsedOsRelease.VERSION || null;
-			}
-		})
-		.catch(() => null);
+		const parsedOsRelease = _(osReleaseString)
+			.split('\n')
+			.map(function (line) {
+				const match = line.match(/(.*)=(.*)/);
+				if (match) {
+					return [
+						match[1],
+						match[2].replace(/^"(.*)"$/, '$1').replace(/^'(.*)'$/, '$1'),
+					];
+				} else {
+					return false;
+				}
+			})
+			.filter()
+			.fromPairs()
+			.value();
+
+		if (
+			parsedOsRelease.NAME !== 'Resin OS' &&
+			parsedOsRelease.NAME !== 'balenaOS'
+		) {
+			return null;
+		} else {
+			return parsedOsRelease.VERSION || null;
+		}
+	} catch {
+		return null;
+	}
 }
 
 /**
