@@ -1,4 +1,59 @@
 - commits:
+    - subject: Avoid running linting in the custom tests
+      hash: 420f93d5b2c60b67157897d8bbe0fab315c98b54
+      body: |
+        Balena-lint for some reason was failing in the
+        windows custom test runner.
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Thodoris Greasidis
+      nested: []
+    - subject: Stop returning Bluebird promises
+      hash: b76200a113fee69e11bf182945c382081f8d25e1
+      body: ""
+      footer:
+        Change-type: major
+        change-type: major
+      author: Thodoris Greasidis
+      nested: []
+    - subject: "package: Publish only the build & typings folders"
+      hash: d1754650272913577b3ce0786941ad54d4acddc8
+      body: ""
+      footer:
+        Change-type: major
+        change-type: major
+      author: Thodoris Greasidis
+      nested: []
+    - subject: Convert to TypeScript with es6 module notation
+      hash: 3576d2c423b294a8703f5474f72a9b906cef927a
+      body: ""
+      footer:
+        Change-type: major
+        change-type: major
+      author: Thodoris Greasidis
+      nested: []
+    - subject: Replace gulp, coffeelint & mochainon with tsc, @balena/lint, mocha,
+        chai & sinon
+      hash: 4c0cf8af370962e8eefda3a2855113629c4ffbb5
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Thodoris Greasidis
+      nested: []
+    - subject: Drop support for node <20.6.0
+      hash: b7c76be409a7a691db66466bc6d6eb746c0ca51e
+      body: ""
+      footer:
+        Change-type: major
+        change-type: major
+      author: Thodoris Greasidis
+      nested: []
+  version: 8.0.0
+  title: ""
+  date: 2024-12-18T17:01:33.082Z
+- commits:
     - subject: "flowzone: Update runner versions"
       hash: ba1222ac43ca13b720b64d18129193be8b99af5b
       body: ""
