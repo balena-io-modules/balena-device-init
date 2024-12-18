@@ -8,6 +8,10 @@
     "type": "git",
     "url": "git://github.com/balena-io/balena-device-init.git"
   },
+  "files": [
+    "build/",
+    "typings/"
+  ],
   "keywords": [
     "balena",
     "device",
@@ -19,36 +23,41 @@
     "test": "tests"
   },
   "scripts": {
-    "build": "gulp build && npm run readme",
+    "build": "tsc && npm run lint && npm run readme",
     "test": "([ \"$GITHUB_WORKFLOW\" = 'Flowzone' ] && [ \"$GITHUB_JOB\" = 'npm_test' ] && echo \"Skipping 'npm test' in flowzone in favor of the custom test action!\") || (npm run build && npm run test:all)",
-    "test:all": "gulp test && coffee tests/e2e.coffee",
-    "prepare": "npm run build",
+    "test:all": "ts-mocha --project ./tsconfig.dev.json --paths tests/e2e.ts",
+    "test:ci": "tsc && npm run test:all",
+    "lint": "balena-lint -e ts src tests -t tsconfig.dev.json",
+    "lint-fix": "balena-lint -e ts src tests --fix -t tsconfig.dev.json",
     "readme": "jsdoc2md --template doc/README.hbs build/init.js > README.md"
   },
   "author": "Juan Cruz Viotti <juan@balena.io>",
   "license": "Apache-2.0",
   "engines": {
-    "node": ">=18"
+    "node": ">=20.6.0"
   },
   "devDependencies": {
+    "@balena/lint": "^9.0.1",
+    "@types/chai": "^4.3.0",
+    "@types/chai-as-promised": "^7.1.4",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^20.17.10",
+    "@types/sinon": "^17.0.3",
     "balena-sdk": "^12.27.0",
-    "coffeescript": "^1.12.7",
+    "chai": "^4.3.6",
+    "chai-as-promised": "^7.1.1",
     "dotenv": "^4.0.0",
     "etcher-sdk": "9.0.8",
-    "gulp": "^4.0.2",
-    "gulp-coffee": "^2.3.5",
-    "gulp-coffeelint": "^0.5.0",
-    "gulp-mocha": "^2.2.0",
-    "gulp-util": "^3.0.8",
     "jsdoc-to-markdown": "^5.0.3",
-    "mocha": "^2.5.3",
-    "mochainon": "^1.0.0",
+    "mocha": "^10.0.0",
+    "sinon": "^19.0.2",
+    "ts-mocha": "^10.0.0",
+    "typescript": "^5.7.2",
     "wary": "^1.1.1"
   },
   "dependencies": {
     "balena-image-fs": "^7.0.6",
     "balena-semver": "^2.2.0",
-    "bluebird": "^3.7.2",
     "lodash": "^4.17.15",
     "reconfix": "1.0.0-v0-1-0-fork-46760acff4d165f5238bfac5e464256ef1944476",
     "resin-device-operations": "^2.0.0",

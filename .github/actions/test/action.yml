@@ -47,4 +47,4 @@ runs:
 
         echo "TEST_EMAIL_KEY: [ ${TEST_EMAIL_KEY} ]"
         echo "TEST_EMAIL: [ ${TEST_EMAIL} ]"
-        npm test
+        npm run test:ci
