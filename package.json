@@ -29,7 +29,7 @@
     "test:all": "ts-mocha --project ./tsconfig.dev.json --paths tests/e2e.ts",
     "test:ci": "tsc && npm run test:all",
     "lint": "balena-lint -e ts src tests -t tsconfig.dev.json",
-    "lint-fix": "balena-lint -e ts src tests --fix -t tsconfig.dev.json",
+    "lint-fix": "balena-lint -e ts src tests -t tsconfig.dev.json --fix",
     "readme": "jsdoc2md --template doc/README.hbs build/init.js > README.md"
   },
   "author": "Juan Cruz Viotti <juan@balena.io>",
