@@ -1,4 +1,24 @@
 - commits:
+    - subject: Drop the unnecessary eslint.config.js
+      hash: 91d587f34bf985bf65e6c21278e7cd70f9281656
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Thodoris Greasidis
+      nested: []
+    - subject: "packacke.json: Explicitly set type commonjs"
+      hash: f6a0be1d12f09d7d910e5ae35f48f1268542a74e
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Thodoris Greasidis
+      nested: []
+  version: 8.0.1
+  title: ""
+  date: 2024-12-19T13:41:14.170Z
+- commits:
     - subject: Avoid running linting in the custom tests
       hash: 420f93d5b2c60b67157897d8bbe0fab315c98b54
       body: |
