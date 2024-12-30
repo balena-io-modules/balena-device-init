@@ -1,4 +1,16 @@
 - commits:
+    - subject: Try to find the boot partition by inspecting the image
+      hash: de53f11c56133bf2757c5361f8dbc6afa9e826fc
+      body: ""
+      footer:
+        Change-type: minor
+        change-type: minor
+      author: Thodoris Greasidis
+      nested: []
+  version: 8.1.0
+  title: ""
+  date: 2024-12-30T12:41:49.474Z
+- commits:
     - subject: Drop the unnecessary eslint.config.js
       hash: 91d587f34bf985bf65e6c21278e7cd70f9281656
       body: ""
