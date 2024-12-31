@@ -16,7 +16,6 @@ limitations under the License.
 
 import _ from 'lodash';
 import path from 'path';
-import * as util from 'node:util';
 import * as imagefs from 'balena-image-fs';
 import { getBootPartition } from 'balena-config-json';
 
@@ -48,8 +47,7 @@ export async function getImageManifest(
 			image,
 			bootPartitionNumber,
 			function (_fs) {
-				const readFileAsync = util.promisify(_fs.readFile);
-				return readFileAsync('/device-type.json', {
+				return _fs.promises.readFile('/device-type.json', {
 					encoding: 'utf8',
 				});
 			},
@@ -167,8 +165,7 @@ export async function getImageOsVersion(
 			definition.image,
 			definition.partition,
 			function (_fs) {
-				const readFileAsync = util.promisify(_fs.readFile);
-				return readFileAsync('/os-release', { encoding: 'utf8' });
+				return _fs.promises.readFile('/os-release', { encoding: 'utf8' });
 			},
 		);
 
@@ -235,8 +232,7 @@ export const writeConfigJSON = function (
 		definitionWithImage.image,
 		definitionWithImage.partition,
 		function (_fs) {
-			const writeFileAsync = util.promisify(_fs.writeFile);
-			return writeFileAsync(definitionWithImage.path, serializedConfig);
+			return _fs.promises.writeFile(definitionWithImage.path, serializedConfig);
 		},
 	);
 };
