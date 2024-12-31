@@ -160,7 +160,7 @@ const prepareImageOS1NetworkConfig = function (
  *
  * @returns {Promise<void>}
  */
-const prepareImageOS2WifiConfig = function (
+const prepareImageOS2WifiConfig = async function (
 	target: string,
 	manifest: DeviceTypeJsonWithConfiguration,
 ) {
@@ -171,96 +171,77 @@ const prepareImageOS2WifiConfig = function (
 	 * * if the `resin-sample.ignore` exists, it's copied to `resin-wifi`
 	 * * otherwise, the new file is created from a hardcoded template
 	 */
-	const connectionsFolderDefinition = utils.definitionForImage(
+	const inputDefinition = utils.definitionForImage(
 		target,
-		getConfigPathDefinition(manifest, CONNECTIONS_FOLDER),
+		utils.convertFilePathDefinition(manifest.configuration.config),
 	);
 
-	return imagefs
-		.interact(
-			connectionsFolderDefinition.image,
-			connectionsFolderDefinition.partition,
-			function (_fs) {
-				const readdirAsync = util.promisify(_fs.readdir);
-				return readdirAsync(connectionsFolderDefinition.path);
+	const files = await imagefs.interact(
+		inputDefinition.image,
+		inputDefinition.partition,
+		function (_fs) {
+			const readdirAsync = util.promisify(_fs.readdir);
+			return readdirAsync(CONNECTIONS_FOLDER);
+		},
+	);
+
+	// The required file already exists
+	if (_.includes(files, 'resin-wifi')) {
+		return;
+	}
+
+	// Fresh image, new format, according to https://github.com/resin-os/meta-resin/pull/770/files
+	if (_.includes(files, 'resin-sample.ignore')) {
+		await imagefs.interact(
+			inputDefinition.image,
+			inputDefinition.partition,
+			async function (_fs) {
+				const readFileAsync = util.promisify(_fs.readFile);
+				const writeFileAsync = util.promisify(_fs.writeFile);
+				const contents = await readFileAsync(
+					`${CONNECTIONS_FOLDER}/resin-sample.ignore`,
+					{
+						encoding: 'utf8',
+					},
+				);
+				await writeFileAsync(`${CONNECTIONS_FOLDER}/resin-wifi`, contents);
 			},
-		)
-		.then(function (files) {
-			// The required file already exists
-			if (_.includes(files, 'resin-wifi')) {
-				return;
-			}
+		);
+		return;
+	}
 
-			// Fresh image, new format, according to https://github.com/resin-os/meta-resin/pull/770/files
-			if (_.includes(files, 'resin-sample.ignore')) {
-				const inputDefinition = utils.definitionForImage(
-					target,
-					getConfigPathDefinition(
-						manifest,
-						`${CONNECTIONS_FOLDER}/resin-sample.ignore`,
-					),
-				);
-				const outputDefinition = utils.definitionForImage(
-					target,
-					getConfigPathDefinition(manifest, `${CONNECTIONS_FOLDER}/resin-wifi`),
-				);
-				return imagefs.interact(
-					inputDefinition.image,
-					inputDefinition.partition,
-					function (_fs) {
-						const readFileAsync = util.promisify(_fs.readFile);
-						const writeFileAsync = util.promisify(_fs.writeFile);
-						return readFileAsync(inputDefinition.path, {
-							encoding: 'utf8',
-						}).then((contents) =>
-							writeFileAsync(outputDefinition.path, contents),
-						);
+	// Fresh image, old format
+	if (_.includes(files, 'resin-sample')) {
+		await imagefs.interact(
+			inputDefinition.image,
+			inputDefinition.partition,
+			async function (_fs) {
+				const readFileAsync = util.promisify(_fs.readFile);
+				const writeFileAsync = util.promisify(_fs.writeFile);
+				const contents = await readFileAsync(
+					`${CONNECTIONS_FOLDER}/resin-sample`,
+					{
+						encoding: 'utf8',
 					},
 				);
-			}
+				await writeFileAsync(`${CONNECTIONS_FOLDER}/resin-wifi`, contents);
+			},
+		);
+		return;
+	}
 
-			// Fresh image, old format
-			if (_.includes(files, 'resin-sample')) {
-				const inputDefinition = utils.definitionForImage(
-					target,
-					getConfigPathDefinition(
-						manifest,
-						`${CONNECTIONS_FOLDER}/resin-sample`,
-					),
-				);
-				const outputDefinition = utils.definitionForImage(
-					target,
-					getConfigPathDefinition(manifest, `${CONNECTIONS_FOLDER}/resin-wifi`),
-				);
-				return imagefs.interact(
-					inputDefinition.image,
-					inputDefinition.partition,
-					function (_fs) {
-						const readFileAsync = util.promisify(_fs.readFile);
-						const writeFileAsync = util.promisify(_fs.writeFile);
-						return readFileAsync(inputDefinition.path, {
-							encoding: 'utf8',
-						}).then((contents) =>
-							writeFileAsync(outputDefinition.path, contents),
-						);
-					},
-				);
-			}
-
-			// In case there's no file at all (shouldn't happen normally, but the file might have been removed)
-			const definition = utils.definitionForImage(
-				target,
-				getConfigPathDefinition(manifest, `${CONNECTIONS_FOLDER}/resin-wifi`),
+	// In case there's no file at all (shouldn't happen normally, but the file might have been removed)
+	await imagefs.interact(
+		inputDefinition.image,
+		inputDefinition.partition,
+		async function (_fs) {
+			const writeFileAsync = util.promisify(_fs.writeFile);
+			await writeFileAsync(
+				`${CONNECTIONS_FOLDER}/resin-wifi`,
+				DEFAULT_CONNECTION_FILE,
 			);
-			return imagefs.interact(
-				definition.image,
-				definition.partition,
-				function (_fs) {
-					const writeFileAsync = util.promisify(_fs.writeFile);
-					return writeFileAsync(definition.path, DEFAULT_CONNECTION_FILE);
-				},
-			);
-		});
+		},
+	);
 };
 
 // Taken from https://goo.gl/kr1kCt
