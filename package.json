@@ -58,7 +58,7 @@
   },
   "dependencies": {
     "balena-config-json": "^4.2.0",
-    "balena-image-fs": "^7.0.6",
+    "balena-image-fs": "^7.3.0",
     "balena-semver": "^2.2.0",
     "lodash": "^4.17.15",
     "reconfix": "1.0.0-v0-1-0-fork-46760acff4d165f5238bfac5e464256ef1944476",

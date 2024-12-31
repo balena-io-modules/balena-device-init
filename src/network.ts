@@ -20,7 +20,6 @@ limitations under the License.
 
 import _ from 'lodash';
 import path from 'path';
-import * as util from 'node:util';
 import * as imagefs from 'balena-image-fs';
 import reconfix from 'reconfix';
 import * as utils from './utils';
@@ -121,11 +120,10 @@ const prepareImageOS1NetworkConfig = function (
 		configFilePath.image,
 		configFilePath.partition,
 		function (_fs) {
-			const readFileAsync = util.promisify(_fs.readFile);
-			const writeFileAsync = util.promisify(_fs.writeFile);
-			return readFileAsync(configFilePath.path, {
-				encoding: 'utf8',
-			})
+			return _fs.promises
+				.readFile(configFilePath.path, {
+					encoding: 'utf8',
+				})
 				.catch((e) => {
 					if (fileNotFoundError(e)) {
 						return '{}';
@@ -140,7 +138,10 @@ const prepareImageOS1NetworkConfig = function (
 					if (contents.files['network/network.config'] == null) {
 						contents.files['network/network.config'] = '';
 					}
-					return writeFileAsync(configFilePath.path, JSON.stringify(contents));
+					return _fs.promises.writeFile(
+						configFilePath.path,
+						JSON.stringify(contents),
+					);
 				});
 		},
 	);
@@ -180,8 +181,7 @@ const prepareImageOS2WifiConfig = async function (
 		inputDefinition.image,
 		inputDefinition.partition,
 		function (_fs) {
-			const readdirAsync = util.promisify(_fs.readdir);
-			return readdirAsync(CONNECTIONS_FOLDER);
+			return _fs.promises.readdir(CONNECTIONS_FOLDER);
 		},
 	);
 
@@ -196,15 +196,16 @@ const prepareImageOS2WifiConfig = async function (
 			inputDefinition.image,
 			inputDefinition.partition,
 			async function (_fs) {
-				const readFileAsync = util.promisify(_fs.readFile);
-				const writeFileAsync = util.promisify(_fs.writeFile);
-				const contents = await readFileAsync(
+				const contents = await _fs.promises.readFile(
 					`${CONNECTIONS_FOLDER}/resin-sample.ignore`,
 					{
 						encoding: 'utf8',
 					},
 				);
-				await writeFileAsync(`${CONNECTIONS_FOLDER}/resin-wifi`, contents);
+				await _fs.promises.writeFile(
+					`${CONNECTIONS_FOLDER}/resin-wifi`,
+					contents,
+				);
 			},
 		);
 		return;
@@ -216,15 +217,16 @@ const prepareImageOS2WifiConfig = async function (
 			inputDefinition.image,
 			inputDefinition.partition,
 			async function (_fs) {
-				const readFileAsync = util.promisify(_fs.readFile);
-				const writeFileAsync = util.promisify(_fs.writeFile);
-				const contents = await readFileAsync(
+				const contents = await _fs.promises.readFile(
 					`${CONNECTIONS_FOLDER}/resin-sample`,
 					{
 						encoding: 'utf8',
 					},
 				);
-				await writeFileAsync(`${CONNECTIONS_FOLDER}/resin-wifi`, contents);
+				await _fs.promises.writeFile(
+					`${CONNECTIONS_FOLDER}/resin-wifi`,
+					contents,
+				);
 			},
 		);
 		return;
@@ -235,8 +237,7 @@ const prepareImageOS2WifiConfig = async function (
 		inputDefinition.image,
 		inputDefinition.partition,
 		async function (_fs) {
-			const writeFileAsync = util.promisify(_fs.writeFile);
-			await writeFileAsync(
+			await _fs.promises.writeFile(
 				`${CONNECTIONS_FOLDER}/resin-wifi`,
 				DEFAULT_CONNECTION_FILE,
 			);

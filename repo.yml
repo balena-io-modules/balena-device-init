@@ -1,1 +1,4 @@
 type: 'node'
+upstream:
+  - repo: 'balena-image-fs'
+    url: 'https://github.com/balena-io-modules/balena-image-fs'
