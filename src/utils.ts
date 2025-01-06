@@ -154,24 +154,21 @@ export async function getImageOsVersion(
 	try {
 		manifest ??= (await getImageManifest(image)) ?? undefined;
 
-		const definition = {
-			...convertFilePathDefinition(
-				definitionForImage(
-					image,
-					manifest?.configuration?.config ?? {
-						partition: (await getBootPartition(image)) ?? 1,
-					},
-				),
+		const definition = convertFilePathDefinition(
+			definitionForImage(
+				image,
+				manifest?.configuration?.config ?? {
+					partition: (await getBootPartition(image)) ?? 1,
+				},
 			),
-			path: '/os-release',
-		};
+		);
 
 		const osReleaseString = await imagefs.interact(
 			definition.image,
 			definition.partition,
 			function (_fs) {
 				const readFileAsync = util.promisify(_fs.readFile);
-				return readFileAsync(definition.path, { encoding: 'utf8' });
+				return readFileAsync('/os-release', { encoding: 'utf8' });
 			},
 		);
 
