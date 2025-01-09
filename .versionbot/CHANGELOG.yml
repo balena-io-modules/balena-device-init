@@ -1,4 +1,16 @@
 - commits:
+    - subject: "README: Remove the travisci badge"
+      hash: 3602a9c0c503502229d12cc1ec1de5bbcbc1b13c
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Thodoris Greasidis
+      nested: []
+  version: 8.1.3
+  title: ""
+  date: 2025-01-09T21:25:00.155Z
+- commits:
     - subject: Use the promises namespace of balena-image-fs
       hash: de0af086c5d9124e4bbe5d66bf9aafe0f6c5f11b
       body: |
