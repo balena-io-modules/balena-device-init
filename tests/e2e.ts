@@ -3,7 +3,6 @@ import * as sinon from 'sinon';
 import * as fsPromise from 'fs/promises';
 import * as fs from 'fs';
 import path from 'path';
-import * as util from 'node:util';
 import wary from 'wary';
 
 import * as settings from 'balena-settings-client';
@@ -73,8 +72,7 @@ wary.it(
 			.then(waitStream)
 			.then(() =>
 				imagefs.interact(images.raspberrypi, 1, function (_fs) {
-					const readFileAsync = util.promisify(_fs.readFile);
-					return readFileAsync('/config.json', { encoding: 'utf8' });
+					return _fs.promises.readFile('/config.json', { encoding: 'utf8' });
 				}),
 			)
 			.then(JSON.parse)
@@ -101,8 +99,7 @@ wary.it(
 			.then(waitStream)
 			.then(() =>
 				imagefs.interact(images.raspberrypi, 5, function (_fs) {
-					const readFileAsync = util.promisify(_fs.readFile);
-					return readFileAsync('/config.json', { encoding: 'utf8' });
+					return _fs.promises.readFile('/config.json', { encoding: 'utf8' });
 				}),
 			)
 			.then(JSON.parse)
@@ -130,8 +127,7 @@ wary.it(
 			.then(waitStream)
 			.then(() =>
 				imagefs.interact(images.raspberrypi, 1, function (_fs) {
-					const readFileAsync = util.promisify(_fs.readFile);
-					return readFileAsync('/config.json', { encoding: 'utf8' });
+					return _fs.promises.readFile('/config.json', { encoding: 'utf8' });
 				}),
 			)
 			.then(JSON.parse)
@@ -169,8 +165,7 @@ wary.it(
 			.then(waitStream)
 			.then(() =>
 				imagefs.interact(images.raspberrypi, 1, function (_fs) {
-					const readFileAsync = util.promisify(_fs.readFile);
-					return readFileAsync('/system-connections/resin-wifi', {
+					return _fs.promises.readFile('/system-connections/resin-wifi', {
 						encoding: 'utf8',
 					});
 				}),
@@ -408,8 +403,7 @@ wary.it(
 					path.join(images.edison, 'resin-image-edison.hddimg'),
 					undefined,
 					function (_fs) {
-						const readFileAsync = util.promisify(_fs.readFile);
-						return readFileAsync('/config.json', { encoding: 'utf8' });
+						return _fs.promises.readFile('/config.json', { encoding: 'utf8' });
 					},
 				),
 			)
