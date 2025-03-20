@@ -192,7 +192,9 @@ export async function getImageOsVersion(
 		) {
 			return null;
 		} else {
-			return parsedOsRelease.VERSION || null;
+			return parsedOsRelease.VERSION != null && parsedOsRelease.VERSION !== ''
+				? parsedOsRelease.VERSION
+				: null;
 		}
 	} catch {
 		return null;
