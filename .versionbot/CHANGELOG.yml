@@ -1,4 +1,20 @@
 - commits:
+    - subject: Update dependency reconfix to
+        v1.0.0-v0-1-0-fork-6e4a35edfd299e9302f3791808542e491c7bf6bc
+      hash: 76c316df1b5ab0795f9495d1a976a0554cec9cd2
+      body: >
+        Update reconfix from
+        1.0.0-0-1-0-fork-46760acff4d165f5238bfac5e464256ef1944476 to
+        1.0.0-0-1-0-fork-6e4a35edfd299e9302f3791808542e491c7bf6bc
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: balena-renovate[bot]
+      nested: []
+  version: 8.1.7
+  title: ""
+  date: 2025-03-21T16:57:34.059Z
+- commits:
     - subject: Update dependency etcher-sdk to v9.0.11
       hash: 0bd59fd88e16d88836f1e0423eeb14240bc1173b
       body: |
