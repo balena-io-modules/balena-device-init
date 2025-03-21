@@ -1,4 +1,24 @@
 - commits:
+    - subject: Update balena-lint to 9.1.4
+      hash: 54fa5ed3091ed7842d9386d2fbe951eae1e7c4a1
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Thodoris Greasidis
+      nested: []
+    - subject: Convert some tests to async await
+      hash: 987c3eaf3df3ccddcd4a09369650f15e898eae15
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Thodoris Greasidis
+      nested: []
+  version: 8.1.4
+  title: ""
+  date: 2025-03-21T14:12:35.922Z
+- commits:
     - subject: "README: Remove the travisci badge"
       hash: 3602a9c0c503502229d12cc1ec1de5bbcbc1b13c
       body: ""

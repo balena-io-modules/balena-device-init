@@ -1,6 +1,6 @@
 {
   "name": "balena-device-init",
-  "version": "8.1.3",
+  "version": "8.1.4",
   "description": "Configure and initialize devices using device specs",
   "type": "commonjs",
   "main": "build/init.js",
@@ -67,6 +67,6 @@
     "string-to-stream": "^1.1.1"
   },
   "versionist": {
-    "publishedAt": "2025-01-09T21:25:00.264Z"
+    "publishedAt": "2025-03-21T14:12:36.020Z"
   }
 }
