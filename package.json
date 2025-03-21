@@ -42,7 +42,7 @@
     "@types/chai": "^4.3.0",
     "@types/chai-as-promised": "^7.1.4",
     "@types/mocha": "^10.0.10",
-    "@types/node": "^20.17.10",
+    "@types/node": "^22.0.0",
     "@types/sinon": "^17.0.4",
     "balena-sdk": "^12.27.0",
     "chai": "^4.3.6",
