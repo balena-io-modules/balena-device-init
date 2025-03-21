@@ -3,7 +3,6 @@ balena-device-init
 
 [![npm version](https://badge.fury.io/js/balena-device-init.svg)](http://badge.fury.io/js/balena-device-init)
 [![dependencies](https://david-dm.org/balena-io/balena-device-init.png)](https://david-dm.org/balena-io/balena-device-init.png)
-[![Build Status](https://travis-ci.org/balena-io/balena-device-init.svg?branch=master)](https://travis-ci.org/balena-io/balena-device-init)
 
 Configure and initialize devices using device specs.
 

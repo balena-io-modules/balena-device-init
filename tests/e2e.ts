@@ -8,6 +8,7 @@ import wary from 'wary';
 import * as settings from 'balena-settings-client';
 import * as etcherSdk from 'etcher-sdk';
 import getSdk from 'balena-sdk';
+import type BalenaSdk from 'balena-sdk';
 const sdk = getSdk({
 	apiUrl: settings.get('apiUrl'),
 });
@@ -26,22 +27,30 @@ const EDISON = path.join(__dirname, 'images', 'edison');
 const RANDOM = path.join(__dirname, 'images', 'device.random');
 let DEVICES: Record<string, Awaited<ReturnType<typeof prepareDevice>>> = {};
 
-const prepareDevice = function (deviceType: string) {
+const prepareDevice = async function (deviceType: string) {
 	const applicationName = `DeviceInitE2E_${deviceType.replace(/[- ]/, '_')}`;
 	console.log(`Creating ${applicationName}`);
-	return sdk.models.application
-		.has(applicationName)
-		.then(function (hasApplication) {
-			if (hasApplication) {
-				return;
-			}
-			return sdk.models.application.create({
-				name: applicationName,
-				deviceType,
-			});
-		})
-		.then(sdk.models.device.generateUniqueKey)
-		.then((uuid) => sdk.models.device.register(applicationName, uuid));
+	let app: BalenaSdk.Application | undefined;
+	try {
+		app = await sdk.models.application.get(applicationName, {
+			$select: 'id',
+		});
+	} catch (e) {
+		if (!(e instanceof sdk.errors.BalenaApplicationNotFound)) {
+			throw e;
+		}
+	}
+	if (app == null) {
+		app = await sdk.models.application.create({
+			name: applicationName,
+			deviceType,
+		});
+		console.log(`*** Created application ${app.id}`);
+	} else {
+		console.log(`*** Application ${app.id} already exists`);
+	}
+	const uuid = sdk.models.device.generateUniqueKey();
+	return await sdk.models.device.register(applicationName, uuid);
 };
 
 const waitStream = (stream: init.InitializeEmitter) =>
@@ -93,7 +102,7 @@ wary.it(
 				init
 					.getImageManifest(images.raspberrypi)
 					.then((manifest) =>
-						init.configure(images.raspberrypi, manifest!, config),
+						init.configure(images.raspberrypi, manifest, config),
 					),
 			)
 			.then(waitStream)
@@ -290,10 +299,10 @@ wary.it(
 				// make sure the device-type.json file is read from the image
 				init.getImageManifest(images.raspberrypi).then((manifest) =>
 					init
-						.configure(images.raspberrypi, manifest!, {})
+						.configure(images.raspberrypi, manifest, {})
 						.then(waitStream)
 						.then(() =>
-							init.initialize(images.raspberrypi, manifest!, { drive }),
+							init.initialize(images.raspberrypi, manifest, { drive }),
 						),
 				),
 			)
