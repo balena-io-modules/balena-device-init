@@ -1,4 +1,21 @@
 - commits:
+    - subject: Disable automerge for dependency reconfix
+      hash: cd2051575414b1a21c4a38e39e23cf31b0ead9af
+      body: |
+        This is one of the messy modules that we are using a random branch
+        from a random pr from years and years ago and we should not
+        automerge any changes without inspection.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Kyle Harding <kyle@balena.io>
+        signed-off-by: Kyle Harding <kyle@balena.io>
+      author: Kyle Harding
+      nested: []
+  version: 8.1.10
+  title: ""
+  date: 2025-06-06T19:48:06.899Z
+- commits:
     - subject: Revert "Update dependency reconfix to
         v1.0.0-v0-1-0-fork-6e4a35edfd299e9302f3791808542e491c7bf6bc"
       hash: c385303168c15912e3846a712c38b0089af2ea89
