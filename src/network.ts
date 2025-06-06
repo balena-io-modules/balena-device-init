@@ -132,12 +132,8 @@ const prepareImageOS1NetworkConfig = function (
 				})
 				.then(JSON.parse)
 				.then(function (contents) {
-					if (contents.files == null) {
-						contents.files = {};
-					}
-					if (contents.files['network/network.config'] == null) {
-						contents.files['network/network.config'] = '';
-					}
+					contents.files ??= {};
+					contents.files['network/network.config'] ??= '';
 					return _fs.promises.writeFile(
 						configFilePath.path,
 						JSON.stringify(contents),
