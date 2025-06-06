@@ -61,7 +61,7 @@
     "balena-image-fs": "^7.3.0",
     "balena-semver": "^2.2.0",
     "lodash": "^4.17.21",
-    "reconfix": "1.0.0-v0-1-0-fork-6e4a35edfd299e9302f3791808542e491c7bf6bc",
+    "reconfix": "1.0.0-v0-1-0-fork-46760acff4d165f5238bfac5e464256ef1944476",
     "resin-device-operations": "^2.0.0",
     "rindle": "^1.3.6",
     "string-to-stream": "^1.1.1"
