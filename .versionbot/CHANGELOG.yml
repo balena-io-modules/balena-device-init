@@ -1,4 +1,41 @@
 - commits:
+    - subject: Update flowzone custom actions to use node 20 as per the supported
+        engines
+      hash: 96e262dc37090a59648e0e5b0cac3cc164a3b694
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Thodoris Greasidis
+      nested: []
+    - subject: Update jsdoc-to-markdown to 9.1.2 to fix tests in node 24
+      hash: a6ca8ae5a6f51684932123d9b2aead47cf1e1006
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Thodoris Greasidis
+      nested: []
+    - subject: Switch from ts-mocha to mocha & ts-node to fix node 22.18 tests failing
+      hash: 9f2e49e9d31344cd92757bb89018eba30579b674
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Thodoris Greasidis
+      nested: []
+    - subject: Drop not used rindle dependency
+      hash: a707c7fa2293cc6fd9416349fd634ee3482f9e0c
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Thodoris Greasidis
+      nested: []
+  version: 8.1.12
+  title: ""
+  date: 2025-09-19T12:27:42.191Z
+- commits:
     - subject: Bump etcher-sdk to v10.0.0
       hash: 33cf2e90d8a544a03988108ea3acc9008dd1f0a8
       body: |
