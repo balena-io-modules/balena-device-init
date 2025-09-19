@@ -26,7 +26,7 @@
   "scripts": {
     "build": "tsc && npm run lint && npm run readme",
     "test": "([ \"$GITHUB_WORKFLOW\" = 'Flowzone' ] && [ \"$GITHUB_JOB\" = 'npm_test' ] && echo \"Skipping 'npm test' in flowzone in favor of the custom test action!\") || (npm run build && npm run test:all)",
-    "test:all": "ts-mocha --project ./tsconfig.dev.json --paths tests/e2e.ts",
+    "test:all": "mocha -r ts-node/register/transpile-only --reporter spec tests/**/*.ts",
     "test:ci": "tsc && npm run test:all",
     "lint": "balena-lint -e ts src tests -t tsconfig.dev.json",
     "lint-fix": "balena-lint -e ts src tests -t tsconfig.dev.json --fix",
@@ -50,9 +50,9 @@
     "dotenv": "^4.0.0",
     "etcher-sdk": "^10.0.0",
     "jsdoc-to-markdown": "^5.0.3",
-    "mocha": "^10.0.0",
+    "mocha": "^11.0.0",
     "sinon": "^19.0.4",
-    "ts-mocha": "^10.0.0",
+    "ts-node": "^10.9.2",
     "typescript": "^5.8.2",
     "wary": "^1.1.1"
   },
