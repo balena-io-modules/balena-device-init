@@ -6,3 +6,5 @@ upstream:
     url: 'https://github.com/balena-io-modules/balena-image-fs'
   - repo: 'balena-semver'
     url: 'https://github.com/balena-io-modules/balena-semver'
+  - repo: 'reconfix'
+    url: 'https://github.com/balena-io/reconfix'
