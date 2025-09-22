@@ -4,10 +4,10 @@
   "description": "Configure and initialize devices using device specs",
   "type": "commonjs",
   "main": "build/init.js",
-  "homepage": "https://github.com/balena-io/balena-device-init",
+  "homepage": "https://github.com/balena-io-modules/balena-device-init",
   "repository": {
     "type": "git",
-    "url": "git://github.com/balena-io/balena-device-init.git"
+    "url": "git://github.com/balena-io-modules/balena-device-init.git"
   },
   "files": [
     "build/",
@@ -32,7 +32,7 @@
     "lint-fix": "balena-lint -e ts src tests -t tsconfig.dev.json --fix",
     "readme": "jsdoc2md --template doc/README.hbs build/init.js > README.md"
   },
-  "author": "Juan Cruz Viotti <juan@balena.io>",
+  "author": "Balena Ltd. <hello@balena.io>",
   "license": "Apache-2.0",
   "engines": {
     "node": ">=20.6.0"
