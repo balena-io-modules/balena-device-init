@@ -2,6 +2,8 @@ type: 'node'
 upstream:
   - repo: 'balena-config-json'
     url: 'https://github.com/balena-io-modules/balena-config-json'
+  - repo: 'resin-device-operations'
+    url: 'https://github.com/balena-io-modules/resin-device-operations'
   - repo: 'balena-image-fs'
     url: 'https://github.com/balena-io-modules/balena-image-fs'
   - repo: 'balena-semver'
