@@ -1,4 +1,8 @@
 type: 'node'
 upstream:
+  - repo: 'balena-config-json'
+    url: 'https://github.com/balena-io-modules/balena-config-json'
   - repo: 'balena-image-fs'
     url: 'https://github.com/balena-io-modules/balena-image-fs'
+  - repo: 'balena-semver'
+    url: 'https://github.com/balena-io-modules/balena-semver'
