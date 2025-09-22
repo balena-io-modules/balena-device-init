@@ -1,4 +1,298 @@
 - commits:
+    - subject: Update balena-semver to 3.0.10
+      hash: 1ad2f1c81b10a06347ab990077f8a06244f48bed
+      body: |
+        Update balena-semver from 2.2.0 to 3.0.10
+      footer:
+        Change-type: patch
+        change-type: patch
+        See: https://github.com/balena-io-modules/balena-semver/blob/master/CHANGELOG.md#300---2023-12-12
+        see: https://github.com/balena-io-modules/balena-semver/blob/master/CHANGELOG.md#300---2023-12-12
+      author: Thodoris Greasidis
+      nested:
+        - commits:
+            - subject: Simplify automation of tests/docs by using the mocha cli
+              hash: 93a6bfa75490adbf2f19de6e1e59517169cced2d
+              body: ""
+              footer:
+                Change-type: patch
+                change-type: patch
+              author: Pagan Gazzard
+              nested: []
+            - subject: Improve readability of README examples
+              hash: cb3372278ddd43ee0dd10f4227e453bcdb2bb215
+              body: ""
+              footer:
+                Change-type: patch
+                change-type: patch
+              author: Pagan Gazzard
+              nested: []
+            - subject: Enable linting for automation scripts
+              hash: 3cb65647fdbce5b01e872760d33574f62bc18073
+              body: ""
+              footer:
+                Change-type: patch
+                change-type: patch
+              author: Pagan Gazzard
+              nested: []
+          version: balena-semver-3.0.10
+          title: ""
+          date: 2025-08-22T16:56:25.668Z
+        - commits:
+            - subject: Switch tsconfig module to `Node16`, remaining as commonjs
+              hash: 193ad5c913832a41b0b0ea366670c0c103e7a27d
+              body: ""
+              footer:
+                Change-type: patch
+                change-type: patch
+              author: Pagan Gazzard
+              nested: []
+          version: balena-semver-3.0.9
+          title: ""
+          date: 2025-08-22T16:43:46.005Z
+        - commits:
+            - subject: Update dependencies
+              hash: 8ba9396324c1179bf89f210bef8c5979cb8fd7e5
+              body: ""
+              footer:
+                Change-type: patch
+                change-type: patch
+              author: Pagan Gazzard
+              nested: []
+          version: balena-semver-3.0.8
+          title: ""
+          date: 2025-08-22T15:23:15.769Z
+        - commits:
+            - subject: Update dependency lint-staged to v16
+              hash: 1b8245e4836905dbdac02e1de91d6838484a4f0e
+              body: |
+                Update lint-staged from 15.5.2 to 16.0.0
+              footer:
+                Change-type: patch
+                change-type: patch
+              author: balena-renovate[bot]
+              nested: []
+          version: balena-semver-3.0.7
+          title: ""
+          date: 2025-06-07T23:25:27.416Z
+        - commits:
+            - subject: Update dependency husky to v9
+              hash: f3567b48550673689a25e201ae390089b00d60b1
+              body: |
+                Update husky from 8.0.3 to 9.1.7
+              footer:
+                Change-type: patch
+                change-type: patch
+              author: balena-renovate[bot]
+              nested: []
+          version: balena-semver-3.0.6
+          title: ""
+          date: 2025-04-09T10:59:59.990Z
+        - commits:
+            - subject: Update balena-lint to v9
+              hash: bfc2e7390ab87a65a1522e48db65a8c5f5732554
+              body: ""
+              footer:
+                Change-type: patch
+                change-type: patch
+              author: joshbwlng
+              nested: []
+          version: balena-semver-3.0.5
+          title: ""
+          date: 2025-04-08T07:43:32.210Z
+        - commits:
+            - subject: Update dependency jsdoc-to-markdown to v9
+              hash: 3019d85fa9ddf26c50b6ea242e6893b1ebb575ba
+              body: |
+                Update jsdoc-to-markdown from 8.0.3 to 9.1.1
+              footer:
+                Change-type: patch
+                change-type: patch
+              author: balena-renovate[bot]
+              nested: []
+          version: balena-semver-3.0.4
+          title: ""
+          date: 2025-04-08T02:24:44.634Z
+        - commits:
+            - subject: Update dependency mocha to v11
+              hash: 92800a2e5ed45435db6fd4c12faa3302485e848b
+              body: |
+                Update mocha from 10.8.2 to 11.1.0
+              footer:
+                Change-type: patch
+                change-type: patch
+              author: balena-renovate[bot]
+              nested: []
+          version: balena-semver-3.0.3
+          title: ""
+          date: 2025-04-02T14:06:18.892Z
+        - commits:
+            - subject: Update dependency @balena/lint to v8
+              hash: 36903a103f6fdb5f80e14abc887530b01c04fccb
+              body: |
+                Update @balena/lint from 7.3.0 to 8.2.8
+              footer:
+                Change-type: patch
+                change-type: patch
+              author: balena-renovate[bot]
+              nested: []
+          version: balena-semver-3.0.2
+          title: ""
+          date: 2025-03-25T17:14:22.133Z
+        - commits:
+            - subject: Fix parsing & incrementing semver parts > 1000
+              hash: 75905801615827ffe8f2d2303116f5eb2ecfc043
+              body: ""
+              footer:
+                Change-type: patch
+                change-type: patch
+              author: Thodoris Greasidis
+              nested: []
+          version: balena-semver-3.0.1
+          title: ""
+          date: 2025-02-14T18:42:07.174Z
+        - commits:
+            - subject: Update dependencies
+              hash: 2e4484b43d1da62de72a1e6a536422ab84eb5072
+              body: ""
+              footer:
+                Change-type: patch
+                change-type: patch
+              author: Thodoris Greasidis
+              nested: []
+            - subject: Drop support for nodejs < 16.0.0
+              hash: d59a62e97e93e80ac299694d169e2ccad944ccc8
+              body: ""
+              footer:
+                Change-type: major
+                change-type: major
+              author: Thodoris Greasidis
+              nested: []
+          version: balena-semver-3.0.0
+          title: ""
+          date: 2023-12-12T14:57:30.421Z
+        - commits:
+            - subject: Test sorting pre-releases across revisions of the same semver
+              hash: dabe1a2e0ad65345132c8b282e0fff3391a508d6
+              body: ""
+              footer:
+                Change-type: patch
+                change-type: patch
+              author: Thodoris Greasidis
+              nested: []
+            - subject: Block the creation of package-lock.json
+              hash: 7a70f3b9c0846670f027c416237a96804d7658e5
+              body: ""
+              footer:
+                Change-type: patch
+                change-type: patch
+              author: Thodoris Greasidis
+              nested: []
+          version: balena-semver-2.3.5
+          title: ""
+          date: 2023-10-25T10:01:51.841Z
+        - commits:
+            - subject: Fix the `.compare()` method test when used with sorting
+              hash: 4cdf8016bc4c17f64fc566366fad833f9df5c77c
+              body: ""
+              footer:
+                Change-type: patch
+                change-type: patch
+              author: Thodoris Greasidis
+              nested: []
+          version: balena-semver-2.3.4
+          title: ""
+          date: 2023-10-25T09:56:14.151Z
+        - commits:
+            - subject: Update TypeScript to 4.9.5
+              hash: 2c39d47bc602282c5f20b62b917e53bfbc11c650
+              body: ""
+              footer:
+                Change-type: patch
+                change-type: patch
+              author: Thodoris Greasidis
+              nested: []
+            - subject: "patch: Update flowzone.yml"
+              hash: ce02a95d8e2568a0bb7de892779117a89a86d7e8
+              body: ""
+              footer: {}
+              author: Kyle Harding
+              nested: []
+          version: balena-semver-2.3.3
+          title: ""
+          date: 2023-07-14T07:16:10.666Z
+        - commits:
+            - subject: Delete redundant .resinci.yml
+              hash: cd03cee06cb838ee22ce4c8181c492d9b20873c9
+              body: ""
+              footer:
+                Change-type: patch
+                change-type: patch
+              author: Thodoris Greasidis
+              nested: []
+          version: balena-semver-2.3.2
+          title: ""
+          date: 2022-09-26T12:41:08.956Z
+        - commits:
+            - subject: Drop the .travis.yml
+              hash: 14b4554172e6740c8d1093662523fcf1588def65
+              body: ""
+              footer:
+                Change-type: patch
+                change-type: patch
+                Signed-off-by: Thodoris Greasidis <thodoris@balena.io>
+                signed-off-by: Thodoris Greasidis <thodoris@balena.io>
+              author: Thodoris Greasidis
+              nested: []
+            - subject: Specify node 10 as the minimum supported node engine in the
+                package.json
+              hash: 47ad6d436eae50320745d3025209b136c4278ba5
+              body: |
+                The semver 7.1.3 package already has node
+                10 as the minimum engine.
+              footer:
+                Change-type: patch
+                change-type: patch
+                See: https://github.com/npm/node-semver/blob/v7.1.3/package.json
+                see: https://github.com/npm/node-semver/blob/v7.1.3/package.json
+                Signed-off-by: Thodoris Greasidis <thodoris@balena.io>
+                signed-off-by: Thodoris Greasidis <thodoris@balena.io>
+              author: Thodoris Greasidis
+              nested: []
+            - subject: Replace balenaCI with flowzone
+              hash: 6dc01937842ea439d97b95fa8c9a7cc36efcc50a
+              body: ""
+              footer:
+                Change-type: patch
+                change-type: patch
+              author: Thodoris Greasidis
+              nested: []
+          version: balena-semver-2.3.1
+          title: ""
+          date: 2022-09-22T22:32:46.912Z
+        - commits:
+            - subject: Support underscore version variants
+              hash: abebeaa230588dbe101336ccb2f9531ae57c10a2
+              body: >
+                A bunch of supervisor versions container the string `_logstream`
+                at the
+
+                end. We convert this to a +logstream and handle it like any
+                other build
+
+                metadata.
+              footer:
+                Change-type: minor
+                change-type: minor
+                Signed-off-by: Cameron Diver <cameron@balena.io>
+                signed-off-by: Cameron Diver <cameron@balena.io>
+              author: Cameron Diver
+          version: balena-semver-2.3.0
+          date: 2020-03-11T16:57:22.101Z
+  version: 8.1.13
+  title: ""
+  date: 2025-09-22T09:42:59.858Z
+- commits:
     - subject: Update flowzone custom actions to use node 20 as per the supported
         engines
       hash: 96e262dc37090a59648e0e5b0cac3cc164a3b694
