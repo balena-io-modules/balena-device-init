@@ -1,4 +1,462 @@
 - commits:
+    - subject: Update resin-device-operations to 4.0.0
+      hash: 980fbcccaff01286cd53b356c72ee3150b157826
+      body: |
+        Update resin-device-operations from 3.0.0 to 4.0.0
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Thodoris Greasidis
+      nested:
+        - commits:
+            - subject: Update rindle to 3.0.0
+              hash: 22752b30b3321accfd648568558bf1f929583266
+              body: |
+                Update rindle from 1.3.0 to 3.0.0
+              footer:
+                Change-type: patch
+                change-type: patch
+              author: Thodoris Greasidis
+              nested:
+                - commits:
+                    - subject: Update jsdoc-to-markdown to v9 and regenerate the README
+                      hash: 47845a8b2fade087250929d666eff897db95efcd
+                      body: ""
+                      footer:
+                        Change-type: patch
+                        change-type: patch
+                      author: Thodoris Greasidis
+                    - subject: Drop the getStreamFromString method
+                      hash: 02717a0a91b1d56f00d46edb016e09211dadc5cb
+                      body: ""
+                      footer:
+                        Change-type: major
+                        change-type: major
+                      author: Thodoris Greasidis
+                  version: rindle-3.0.0
+                  title: ""
+                  date: 2025-09-23T14:17:38.449Z
+                - commits:
+                    - subject: Drop Bluebird in favor of native Promises
+                      hash: c6509a544bfab4a374dfabc1c06bec5b7953d392
+                      body: ""
+                      footer:
+                        Change-type: major
+                        change-type: major
+                      author: Thodoris Greasidis
+                    - subject: Drop support for callbacks in favor of Promises
+                      hash: 566030b122ccf094b0be17d413924089331bd046
+                      body: ""
+                      footer:
+                        Change-type: major
+                        change-type: major
+                      author: Thodoris Greasidis
+                    - subject: Drop support for nodejs < 20
+                      hash: 49f87bc310608e5e564354016e0e7842b59bea34
+                      body: ""
+                      footer:
+                        Change-type: major
+                        change-type: major
+                      author: Thodoris Greasidis
+                    - subject: Block the creation of package-lock.json
+                      hash: d1a4d08a6c365f3ab4c0d47e3fbc78adfd9d47ac
+                      body: ""
+                      footer:
+                        Change-type: patch
+                        change-type: patch
+                      author: Thodoris Greasidis
+                    - subject: Replace balenaCI with flowzone
+                      hash: e0f61f7f86aeb9fa8e8c63169fc057dd90e649cf
+                      body: ""
+                      footer:
+                        Change-type: patch
+                        change-type: patch
+                      author: Thodoris Greasidis
+                    - subject: Drop no longer used hound, travis & appveyor ymls
+                      hash: 87e73ff42f798fb156a677f5743461e9263f6a55
+                      body: ""
+                      footer:
+                        Change-type: patch
+                        change-type: patch
+                      author: Thodoris Greasidis
+                  version: rindle-2.0.0
+                  title: ""
+                  date: 2025-09-22T08:53:39.571Z
+                - version: rindle-1.3.6
+                  date: 2020-04-21T10:42:10Z
+                  commits:
+                    - hash: 3f6178f6b63654743eb9fef081212d6d8fad2653
+                      author: Pagan Gazzard
+                      footers:
+                        change-type: patch
+                      subject: Remove lodash dependency
+                      body: ""
+                - version: rindle-1.3.5
+                  date: 2020-04-20T15:24:03Z
+                  commits:
+                    - hash: edd7e0f62b8072e73b3932723a659e6cfa69d29b
+                      author: Pagan Gazzard
+                      footers:
+                        change-type: patch
+                      subject: Update to gulp 4
+                      body: ""
+                    - hash: 674444150f259a29f6fb362c64d610d80c0df084
+                      author: Pagan Gazzard
+                      footers:
+                        change-type: patch
+                      subject: Switch to balena-lint for linting
+                      body: ""
+                - version: rindle-1.3.4
+                  date: 2019-01-30T15:18:47Z
+                  commits:
+                    - hash: 3f2459bd63ce0e6cb5489fb40a60bdd6d8ba88c1
+                      author: Thodoris Greasidis
+                      footers:
+                        resolves: "#6"
+                        change-type: patch
+                        signed-off-by: Thodoris Greasidis <thodoris@balena.io>
+                      subject: Should import lodash methods independently to reduce bundle size
+                      body: |-
+                        Allows us to drop the balena-sdk minified bundle size by
+                        ~71kb.
+                - version: rindle-1.3.3
+                  date: 2019-01-30T15:06:21Z
+                  commits:
+                    - hash: 3a795db68974948257b65ca1cf5f7fe082b24365
+                      author: Thodoris Greasidis
+                      footers:
+                        change-type: patch
+                        signed-off-by: Thodoris Greasidis <thodoris@balena.io>
+                      subject: "tests: Fix missing semicolon warning"
+                      body: ""
+                - version: rindle-1.3.2
+                  date: 2019-01-29T12:46:43Z
+                  commits:
+                    - hash: 5215fe9ad5c9989a3c16235f7a1c35d7851453c6
+                      author: Thodoris Greasidis
+                      footers:
+                        change-type: patch
+                        signed-off-by: Thodoris Greasidis <thodoris@balena.io>
+                      subject: "travis: Drop 0.x node workers in favor of v6, 8, 10"
+                      body: ""
+                    - hash: 93b92ce6e550a953df0e57f553a0250f4baf9669
+                      author: Thodoris Greasidis
+                      footers:
+                        signed-off-by: Thodoris Greasidis <thodoris@balena.io>
+                      subject: Change license to Apache 2.0
+                      body: ""
+                    - hash: a6721f00e6ff9635aa8895a14dff4581f1eeec58
+                      author: Pagan Gazzard
+                      subject: Update bluebird and lodash to their latest versions
+                      body: ""
+                    - hash: 24b2c6a13d5e01e96d8ab3ae4cce2689de17debe
+                      author: Pagan Gazzard
+                      subject: Fix tests with the latest version of string-to-stream
+                      body: ""
+            - subject: Fix execute().on() not allowing chaining when binding 'end' on an
+                operation that has finished
+              hash: 5d052e4d7a060c82825116a7be982a86c740b478
+              body: ""
+              footer:
+                Change-type: patch
+                change-type: patch
+              author: Thodoris Greasidis
+              nested: []
+            - subject: Switch to async await and drop Bluebird
+              hash: f0a30383cfb61a5f769dc9d53a94491bc9c7b12e
+              body: ""
+              footer:
+                Change-type: major
+                change-type: major
+              author: Thodoris Greasidis
+              nested: []
+            - subject: Update balena-image-fs from 7.0.6 to 7.5.3
+              hash: d22277bf5bdf7beb787ca66a80de03ab26679aa0
+              body: |
+                Update balena-image-fs from 7.0.6 to 7.5.3
+              footer:
+                Change-type: patch
+                change-type: patch
+              author: Thodoris Greasidis
+              nested:
+                - commits:
+                    - subject: Update dependency mocha to v11
+                      hash: adbbd26449df5607b75230df1d041f3db412f163
+                      body: |
+                        Update mocha from 10.8.2 to 11.1.0
+                      footer:
+                        Change-type: patch
+                        change-type: patch
+                      author: balena-renovate[bot]
+                      nested: []
+                  version: balena-image-fs-7.5.3
+                  title: ""
+                  date: 2025-04-09T09:14:18.653Z
+                - commits:
+                    - subject: Update dependency jsdoc-to-markdown to v9
+                      hash: f22a0a1dae022035e5357c147f681f8b7c703fe3
+                      body: |
+                        Update jsdoc-to-markdown from 8.0.3 to 9.1.1
+                      footer:
+                        Change-type: patch
+                        change-type: patch
+                      author: balena-renovate[bot]
+                      nested: []
+                  version: balena-image-fs-7.5.2
+                  title: ""
+                  date: 2025-04-02T10:40:31.219Z
+                - commits:
+                    - subject: Update @balena/lint to v9
+                      hash: 4da5fa44a43047cdb4f96c37a73a0f0674c9327b
+                      body: ""
+                      footer:
+                        Change-type: patch
+                        change-type: patch
+                      author: Thodoris Greasidis
+                      nested: []
+                    - subject: Remove the no longer needed gpt detection helper
+                      hash: 0973da43aa321e4e2dad4b83c5beb965b8da7044
+                      body: ""
+                      footer:
+                        Change-type: patch
+                        change-type: patch
+                      author: Thodoris Greasidis
+                      nested: []
+                    - subject: Update TypeScript to 5.8.2
+                      hash: 1580e7d577e0183c2b5d4f9ce3d0b8f519e4dff3
+                      body: ""
+                      footer:
+                        Change-type: patch
+                        change-type: patch
+                      author: Thodoris Greasidis
+                      nested: []
+                    - subject: Drop the package-lock.json
+                      hash: 400ba55caa4c4af8098e2b164cd184651c283230
+                      body: ""
+                      footer:
+                        Change-type: patch
+                        change-type: patch
+                      author: Thodoris Greasidis
+                      nested: []
+                  version: balena-image-fs-7.5.1
+                  title: ""
+                  date: 2025-03-26T17:51:35.381Z
+                - commits:
+                    - subject: Add function to find a partition by name/label
+                      hash: 4e9b1cfb2739b738dd12bda7d1623e08ad208b46
+                      body: ""
+                      footer:
+                        Change-type: minor
+                        change-type: minor
+                        Signed-off-by: Ken Bannister <kb2ma@runbox.com>
+                        signed-off-by: Ken Bannister <kb2ma@runbox.com>
+                      author: Ken Bannister
+                      nested: []
+                  version: balena-image-fs-7.5.0
+                  title: ""
+                  date: 2025-03-26T12:35:30.365Z
+                - commits:
+                    - subject: bump ext2fs to 4.2.4
+                      hash: 300cc6d5cdd12ce0c47986efe98702511a03f4a5
+                      body: ""
+                      footer:
+                        Change-type: patch
+                        change-type: patch
+                        Signed-off-by: Ryan Cooke<ryan@balena.io>
+                        signed-off-by: Ryan Cooke<ryan@balena.io>
+                      author: Ryan Cooke
+                      nested: []
+                  version: balena-image-fs-7.4.1
+                  title: ""
+                  date: 2025-02-21T10:21:04.380Z
+                - commits:
+                    - subject: Add getLabel() to retrieve filesystem label
+                      hash: a443d9371506db4e4874e787d8d518eef4f68e58
+                      body: ""
+                      footer:
+                        Change-type: minor
+                        change-type: minor
+                        Signed-off-by: Ken Bannister <kb2ma@runbox.com>
+                        signed-off-by: Ken Bannister <kb2ma@runbox.com>
+                      author: Ken Bannister
+                      nested: []
+                  version: balena-image-fs-7.4.0
+                  title: ""
+                  date: 2025-01-27T08:51:07.238Z
+                - commits:
+                    - subject: Drop Bluebird from devDependencies
+                      hash: e4b5c71032112664ba8dac4c9edc5dad5445818d
+                      body: ""
+                      footer:
+                        Change-type: patch
+                        change-type: patch
+                      author: Thodoris Greasidis
+                      nested: []
+                    - subject: "flowzone: Remove empty with clause"
+                      hash: e83b4ef55eeebffb86d0bcda78dd45ee0651c76f
+                      body: ""
+                      footer:
+                        Change-type: patch
+                        change-type: patch
+                      author: Thodoris Greasidis
+                      nested: []
+                    - subject: Add the promises namespace as part of the exposed fs
+                      hash: 9b73f44020de213a682afc21092e20caf68eaff8
+                      body: ""
+                      footer:
+                        Change-type: minor
+                        change-type: minor
+                      author: Thodoris Greasidis
+                      nested: []
+                  version: balena-image-fs-7.3.0
+                  title: ""
+                  date: 2025-01-06T14:31:31.244Z
+                - commits:
+                    - subject: Update dependency @types/node to v20
+                      hash: 4a5f55ae8752b1b28638d3f4016910d5b2057d80
+                      body: |
+                        Update @types/node from 18.11.18 to 20.10.6
+                      footer:
+                        Change-type: patch
+                        change-type: patch
+                      author: Self-hosted Renovate Bot
+                      nested: []
+                  version: balena-image-fs-7.2.2
+                  title: ""
+                  date: 2024-01-02T18:50:24.990Z
+                - commits:
+                    - subject: Remove repo config from flowzone.yml
+                      hash: 3e0053a097a04c1d0c47139bc53787f07bfeb014
+                      body: |
+                        This functionality is being deprecated in Flowzone.
+
+                        See: https://github.com/product-os/flowzone/pull/833
+                      footer:
+                        Change-type: patch
+                        change-type: patch
+                        Signed-off-by: Kyle Harding <kyle@balena.io>
+                        signed-off-by: Kyle Harding <kyle@balena.io>
+                      author: Kyle Harding
+                      nested: []
+                  version: balena-image-fs-7.2.1
+                  title: ""
+                  date: 2023-12-19T21:54:42.129Z
+                - commits:
+                    - subject: Add support for Node 18
+                      hash: 2a3bef60d9688dce26bd1c9546a28c98cf6d2566
+                      body: ""
+                      footer:
+                        Change-type: minor
+                        change-type: minor
+                      author: Akis Kesoglou
+                      nested: []
+                  version: balena-image-fs-7.2.0
+                  title: ""
+                  date: 2023-01-20T14:27:37.169Z
+                - commits:
+                    - subject: Update dependencies
+                      hash: 9acc4bd2e793076095880f1924f8540b4d95fa9c
+                      body: ""
+                      footer:
+                        Change-type: patch
+                        change-type: patch
+                      author: ab77
+                      nested: []
+                  version: balena-image-fs-7.1.2
+                  title: ""
+                  date: 2023-01-05T22:29:15.022Z
+                - commits:
+                    - subject: Update dependency jsdoc-to-markdown to 8.0.0
+                      hash: 5cf71efa734819263bd75c9938cb4367f90e1391
+                      body: |
+                        Update jsdoc-to-markdown to 8.0.0
+
+                        Update jsdoc-to-markdown from 7.1.1 to 8.0.0
+                      footer:
+                        Change-type: patch
+                        change-type: patch
+                      author: Renovate Bot
+                      nested: []
+                  version: balena-image-fs-7.1.1
+                  title: ""
+                  date: 2022-12-20T02:52:28.901Z
+                - commits:
+                    - subject: update dependencies
+                      hash: 71a5bb92caa0658e45d1fb36e8652ca5ea50dee9
+                      body: ""
+                      footer:
+                        Change-type: minor
+                        change-type: minor
+                      author: Zane Hitchcox
+                      nested: []
+                  version: balena-image-fs-7.1.0
+                  title: ""
+                  date: 2022-12-13T00:03:20.006Z
+            - subject: Convert to TypeScript and es module exports
+              hash: e01a9fb0acd504e00519983cdf73d31a22088159
+              body: ""
+              footer:
+                Change-type: major
+                change-type: major
+              author: Thodoris Greasidis
+              nested: []
+            - subject: Switch target to es2018
+              hash: a47f1f7b3cfa0f61649851980851c70591beb852
+              body: ""
+              footer:
+                Change-type: major
+                change-type: major
+              author: Thodoris Greasidis
+              nested: []
+            - subject: Drop hound, travis & appveyor ymls
+              hash: cf9801397c2c7944ce8af0a996c204bf089df8d1
+              body: ""
+              footer:
+                Change-type: patch
+                change-type: patch
+              author: Thodoris Greasidis
+              nested: []
+          version: resin-device-operations-4.0.0
+          title: ""
+          date: 2025-09-23T23:35:39.864Z
+        - commits:
+            - subject: Lint tests
+              hash: 67dd3f274e638e3ee3885dfa25c0f4c9ec96b9e3
+              body: ""
+              footer:
+                Change-type: patch
+                change-type: patch
+              author: Thodoris Greasidis
+            - subject: Convert tests to TypeScript
+              hash: 76ac90435a4b29f7771fbeab24e138e9d400f361
+              body: ""
+              footer:
+                Change-type: patch
+                change-type: patch
+              author: Thodoris Greasidis
+          version: resin-device-operations-3.0.1
+          title: ""
+          date: 2025-09-22T23:05:24.747Z
+    - subject: Update reconfix to 1.0.1
+      hash: d7688ee4b502888d3052d9529e8b2ab502364a44
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Thodoris Greasidis
+      nested: []
+    - subject: Drop not used string-to-stream dependency
+      hash: 782e05d4c87ebf54c9cfcae26720b36975416140
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Thodoris Greasidis
+      nested: []
+  version: 8.1.14
+  title: ""
+  date: 2025-09-24T12:03:44.508Z
+- commits:
     - subject: Update balena-semver to 3.0.10
       hash: 1ad2f1c81b10a06347ab990077f8a06244f48bed
       body: |
