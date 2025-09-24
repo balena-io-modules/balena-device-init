@@ -172,7 +172,7 @@ export async function configure(
 		);
 	}
 
-	return await operations.execute(
+	return operations.execute(
 		image,
 		// @ts-expect-error TODO: Check whether this should be `manifest.initialization.operations` ?
 		configuration.operations,
@@ -210,6 +210,8 @@ export async function configure(
  * 	configuration.on 'end', ->
  * 		console.log('Configuration finished')
  */
+// TODO; Change 'initialize' to no longer be an async function in the next major
+// eslint-disable-next-line @typescript-eslint/require-await -- after the resin-device-operations conversion to TS we realized that we don't need to await 'operations.execute'
 export async function initialize(
 	image: string,
 	manifest: DeviceTypeJson,
@@ -220,9 +222,5 @@ export async function initialize(
 			'Unsupported device type: Manifest missing initialization parameters',
 		);
 	}
-	return await operations.execute(
-		image,
-		manifest.initialization.operations,
-		options,
-	);
+	return operations.execute(image, manifest.initialization.operations, options);
 }
