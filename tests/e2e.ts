@@ -63,7 +63,7 @@ const waitStream = (stream: init.InitializeEmitter) =>
 const getManifest = (slug: string) => sdk.models.device.getManifestBySlug(slug);
 
 // #######################################################################
-// Raspberry Pi
+// Raspberry Pi (testing raw image support)
 // #######################################################################
 wary.it(
 	'should add a config.json correctly to a raspberry pi',
@@ -113,6 +113,23 @@ wary.it(
 			)
 			.then(JSON.parse)
 			.then((parsedConfig) => expect(parsedConfig.isTestConfig).to.equal(true));
+	},
+);
+
+wary.it(
+	'should be able to find the os version of a raspberry pi image',
+	{ raspberrypi: RASPBERRYPI_OS2 },
+	async function (images) {
+		// make sure the device-type.json file is read from the image
+		const manifest = await init.getImageManifest(images.raspberrypi);
+		if (!manifest) {
+			throw new Error(`Could not getImageManifest from raspberrypi image`);
+		}
+		const osVersion = await init.getImageOsVersion(
+			images.raspberrypi,
+			manifest,
+		);
+		expect(osVersion).to.equal('2.3.0+rev1');
 	},
 );
 
