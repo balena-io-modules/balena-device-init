@@ -16,6 +16,7 @@ const sdk = getSdk({
 import * as imagefs from 'balena-image-fs';
 import * as init from '../src/init';
 
+const INTEL_NUC = path.join(__dirname, 'images', 'intel-nuc-6.8.0.img');
 const RASPBERRYPI_OS1 = path.join(__dirname, 'images', 'raspberrypi-os1.img');
 const RASPBERRYPI_OS2 = path.join(__dirname, 'images', 'raspberrypi-os2.img');
 const RASPBERRYPI_WITH_DEVICE_TYPE = path.join(
@@ -403,6 +404,45 @@ wary.it(
 				expect(args[0].percentage).to.equal(100);
 				return expect(args[0].eta).to.equal(0);
 			});
+	},
+);
+
+// #######################################################################
+// Intel NUC (testing flasher image support)
+// #######################################################################
+
+wary.it(
+	'should add a correct config.json to an intel NUC image containing a device-type.json',
+	{ intelnuc: INTEL_NUC },
+	async function (images) {
+		const config = { isTestConfig: true };
+		// make sure the device-type.json file is read from the image
+		const manifest = await init.getImageManifest(images.intelnuc);
+		if (!manifest) {
+			throw new Error(`Could not getImageManifest from inte-nuc image`);
+		}
+		await waitStream(await init.configure(images.intelnuc, manifest, config));
+
+		const parsedConfig = JSON.parse(
+			await imagefs.interact(images.intelnuc, 1, function (_fs) {
+				return _fs.promises.readFile('/config.json', { encoding: 'utf8' });
+			}),
+		);
+		expect(parsedConfig.isTestConfig).to.equal(true);
+	},
+);
+
+wary.it(
+	'should be able to find the os version of an intel NUC image',
+	{ intelnuc: INTEL_NUC },
+	async function (images) {
+		// make sure the device-type.json file is read from the image
+		const manifest = await init.getImageManifest(images.intelnuc);
+		if (!manifest) {
+			throw new Error(`Could not getImageManifest from inte-nuc image`);
+		}
+		const osVersion = await init.getImageOsVersion(images.intelnuc, manifest);
+		expect(osVersion).to.equal('6.8.0+rev6');
 	},
 );
 
