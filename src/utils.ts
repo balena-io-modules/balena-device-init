@@ -17,6 +17,8 @@ limitations under the License.
 import _ from 'lodash';
 import path from 'path';
 import * as imagefs from 'balena-image-fs';
+import * as filedisk from 'file-disk';
+import { getPartitions } from 'partitioninfo';
 import { getBootPartition } from 'balena-config-json';
 
 import type {
@@ -122,6 +124,7 @@ export function definitionForImage<
 			configDefinition.image != null
 				? // Sometimes (e.g. edison) our 'image' is a folder of images, and the
 					// config specifies which one within that we should be using
+					// TODO: Remove after we drop support for the edison in the next major
 					path.join(image, configDefinition.image)
 				: image,
 	};
@@ -161,11 +164,61 @@ export async function getImageOsVersion(
 			),
 		);
 
-		const osReleaseString = await imagefs.interact(
+		// Try to find the os-release in the boot partition
+		let osReleaseString = await imagefs.interact(
 			definition.image,
 			definition.partition,
-			function (_fs) {
-				return _fs.promises.readFile('/os-release', { encoding: 'utf8' });
+			async function (_fs) {
+				try {
+					return await _fs.promises.readFile('/os-release', {
+						encoding: 'utf8',
+					});
+				} catch (err) {
+					if (
+						err instanceof Error &&
+						'code' in err &&
+						// fatfs throws errors with NOENT code, even though ENOENT is the standard
+						// See: https://github.com/balena-io-modules/balena-image-fs/blob/v7.5.3/tests/e2e.ts#L300
+						(err.code === 'ENOENT' || err.code === 'NOENT')
+					) {
+						return null;
+					}
+					throw err;
+				}
+			},
+		);
+
+		// Otherwise try find the os-release in the rootA partition, since it might be a "flasher" image
+		osReleaseString ??= await filedisk.withOpenFile(
+			definition.image,
+			'r',
+			async (handle) => {
+				const disk = new filedisk.FileDisk(handle, true, false, false);
+				const partitionInfo = await getPartitions(disk, {
+					includeExtended: false,
+					getLogical: true,
+				});
+
+				const foundPartition = await imagefs.findPartition(
+					disk,
+					partitionInfo,
+					[`resin-rootA`, `flash-rootA`, `balena-rootA`],
+				);
+				if (foundPartition == null) {
+					throw new Error(
+						'Unsupported OS image: Could not find rootA partition',
+					);
+				}
+
+				return await imagefs.interact(
+					disk,
+					foundPartition.index,
+					async (_fs) => {
+						return await _fs.promises.readFile('/etc/os-release', {
+							encoding: 'utf8',
+						});
+					},
+				);
 			},
 		);
 

@@ -16,6 +16,8 @@ const sdk = getSdk({
 import * as imagefs from 'balena-image-fs';
 import * as init from '../src/init';
 
+const INTEL_NUC = path.join(__dirname, 'images', 'intel-nuc-6.8.0.img');
+const GENERIC_AMD64 = path.join(__dirname, 'images', 'generic-amd64-6.8.1.img');
 const RASPBERRYPI_OS1 = path.join(__dirname, 'images', 'raspberrypi-os1.img');
 const RASPBERRYPI_OS2 = path.join(__dirname, 'images', 'raspberrypi-os2.img');
 const RASPBERRYPI_WITH_DEVICE_TYPE = path.join(
@@ -63,7 +65,7 @@ const waitStream = (stream: init.InitializeEmitter) =>
 const getManifest = (slug: string) => sdk.models.device.getManifestBySlug(slug);
 
 // #######################################################################
-// Raspberry Pi
+// Raspberry Pi (testing raw image support)
 // #######################################################################
 wary.it(
 	'should add a config.json correctly to a raspberry pi',
@@ -113,6 +115,23 @@ wary.it(
 			)
 			.then(JSON.parse)
 			.then((parsedConfig) => expect(parsedConfig.isTestConfig).to.equal(true));
+	},
+);
+
+wary.it(
+	'should be able to find the os version of a raspberry pi image',
+	{ raspberrypi: RASPBERRYPI_OS2 },
+	async function (images) {
+		// make sure the device-type.json file is read from the image
+		const manifest = await init.getImageManifest(images.raspberrypi);
+		if (!manifest) {
+			throw new Error(`Could not getImageManifest from raspberrypi image`);
+		}
+		const osVersion = await init.getImageOsVersion(
+			images.raspberrypi,
+			manifest,
+		);
+		expect(osVersion).to.equal('2.3.0+rev1');
 	},
 );
 
@@ -389,6 +408,90 @@ wary.it(
 	},
 );
 
+// #######################################################################
+// Intel NUC (testing flasher MBR image support)
+// #######################################################################
+
+wary.it(
+	'should add a correct config.json to an intel NUC image containing a device-type.json',
+	{ intelnuc: INTEL_NUC },
+	async function (images) {
+		const config = { isTestConfig: true };
+		// make sure the device-type.json file is read from the image
+		const manifest = await init.getImageManifest(images.intelnuc);
+		if (!manifest) {
+			throw new Error(`Could not getImageManifest from inte-nuc image`);
+		}
+		await waitStream(await init.configure(images.intelnuc, manifest, config));
+
+		const parsedConfig = JSON.parse(
+			await imagefs.interact(images.intelnuc, 1, function (_fs) {
+				return _fs.promises.readFile('/config.json', { encoding: 'utf8' });
+			}),
+		);
+		expect(parsedConfig.isTestConfig).to.equal(true);
+	},
+);
+
+wary.it(
+	'should be able to find the os version of an intel NUC image',
+	{ intelnuc: INTEL_NUC },
+	async function (images) {
+		// make sure the device-type.json file is read from the image
+		const manifest = await init.getImageManifest(images.intelnuc);
+		if (!manifest) {
+			throw new Error(`Could not getImageManifest from inte-nuc image`);
+		}
+		const osVersion = await init.getImageOsVersion(images.intelnuc, manifest);
+		expect(osVersion).to.equal('6.8.0+rev6');
+	},
+);
+
+// #######################################################################
+// Generic AMD64 (testing flasher GPT image support)
+// #######################################################################
+
+wary.it(
+	'should add a correct config.json to a Generic AMD64 image containing a device-type.json',
+	{ genericAmd64: GENERIC_AMD64 },
+	async function (images) {
+		const config = { isTestConfig: true };
+		// make sure the device-type.json file is read from the image
+		const manifest = await init.getImageManifest(images.genericAmd64);
+		if (!manifest) {
+			throw new Error(`Could not getImageManifest from inte-nuc image`);
+		}
+		await waitStream(
+			await init.configure(images.genericAmd64, manifest, config),
+		);
+
+		const parsedConfig = JSON.parse(
+			await imagefs.interact(images.genericAmd64, 1, function (_fs) {
+				return _fs.promises.readFile('/config.json', { encoding: 'utf8' });
+			}),
+		);
+		expect(parsedConfig.isTestConfig).to.equal(true);
+	},
+);
+
+wary.it(
+	'should be able to find the os version of a Generic AMD64 image',
+	{ genericAmd64: GENERIC_AMD64 },
+	async function (images) {
+		// make sure the device-type.json file is read from the image
+		const manifest = await init.getImageManifest(images.genericAmd64);
+		if (!manifest) {
+			throw new Error(`Could not getImageManifest from inte-nuc image`);
+		}
+		const osVersion = await init.getImageOsVersion(
+			images.genericAmd64,
+			manifest,
+		);
+		expect(osVersion).to.equal('6.8.1');
+	},
+);
+
+// TODO: Remove after we drop support for the edison in the next major
 // #######################################################################
 // Intel Edison
 // #######################################################################
