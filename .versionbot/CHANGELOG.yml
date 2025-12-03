@@ -1,4 +1,55 @@
 - commits:
+    - subject: Add test for the getImageOsVersion() function on GPT flasher images
+      hash: e9ca9e86636cb0e0ec3c4c568fbd847c02cddadd
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Thodoris Greasidis
+      nested: []
+    - subject: Deprecate support for the edison
+      hash: d856df8e6c4b22f80e710520d1f09ffdc553692c
+      body: >
+        Atm `(await sdk.models.config.getDeviceTypes()).filter(dt =>
+        dt.configuration?.config?.image)`
+
+        gives back only the 'edison', which the
+
+        balena-cli has already dropped support for.
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Thodoris Greasidis
+      nested: []
+    - subject: "getImageOsVersion: Support detecting the version on flasher images"
+      hash: ff45b5c9d04cabab33085a51b8c1343c078dc088
+      body: ""
+      footer:
+        Change-type: minor
+        change-type: minor
+      author: Thodoris Greasidis
+      nested: []
+    - subject: Add test for the getImageOsVersion() function on raw DT images
+      hash: d773fa1e266327f4c9125603f7e785830f3234f6
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Thodoris Greasidis
+      nested: []
+    - subject: "tests/images/raspberrypi-os2.img: Rename the RESIN-BOOT partition to
+        resin-boot as it is supposed to be"
+      hash: c23545739092e276d5f7a84495f83fb5c8249145
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Thodoris Greasidis
+      nested: []
+  version: 8.2.0
+  title: ""
+  date: 2025-12-03T17:39:17.163Z
+- commits:
     - subject: Update resin-device-operations to 4.0.0
       hash: 980fbcccaff01286cd53b356c72ee3150b157826
       body: |
