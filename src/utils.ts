@@ -124,6 +124,7 @@ export function definitionForImage<
 			configDefinition.image != null
 				? // Sometimes (e.g. edison) our 'image' is a folder of images, and the
 					// config specifies which one within that we should be using
+					// TODO: Remove after we drop support for the edison in the next major
 					path.join(image, configDefinition.image)
 				: image,
 	};
