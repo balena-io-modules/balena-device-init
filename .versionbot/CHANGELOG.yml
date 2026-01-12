@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update reconfix to 1.0.2
+      hash: 354055c26bee0cb142b9dfcc4bf1bce8651caa13
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Matthew Yarmolinsky
+      nested: []
+  version: 8.2.1
+  title: ""
+  date: 2026-01-12T18:00:19.120Z
+- commits:
     - subject: Add test for the getImageOsVersion() function on GPT flasher images
       hash: e9ca9e86636cb0e0ec3c4c568fbd847c02cddadd
       body: ""
