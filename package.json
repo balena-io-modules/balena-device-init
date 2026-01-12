@@ -61,7 +61,7 @@
     "balena-image-fs": "^7.3.0",
     "balena-semver": "^3.0.10",
     "lodash": "^4.17.21",
-    "reconfix": "^1.0.1",
+    "reconfix": "^1.0.2",
     "resin-device-operations": "^4.0.0"
   },
   "versionist": {
