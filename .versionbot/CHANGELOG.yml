@@ -1,4 +1,18 @@
 - commits:
+    - subject: "Add id-token: write permission for NPM OIDC publishing"
+      hash: f11075c31b2e63f96a6a2bf605f09a674c6e91f2
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Kyle Harding <kyle@balena.io>
+        signed-off-by: Kyle Harding <kyle@balena.io>
+      author: Kyle Harding
+      nested: []
+  version: 8.2.2
+  title: ""
+  date: 2026-02-19T01:59:33.574Z
+- commits:
     - subject: Update reconfix to 1.0.2
       hash: 354055c26bee0cb142b9dfcc4bf1bce8651caa13
       body: ""
