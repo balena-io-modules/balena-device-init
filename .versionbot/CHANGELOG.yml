@@ -1,4 +1,17 @@
 - commits:
+    - subject: Update actions/setup-node digest to 49933ea
+      hash: 0f677a01b2b1f716ec8b3d58f4efaa0be8b94b45
+      body: |
+        Update actions/setup-node
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: balena-renovate[bot]
+      nested: []
+  version: 8.2.3
+  title: ""
+  date: 2026-05-12T17:56:21.632Z
+- commits:
     - subject: "Add id-token: write permission for NPM OIDC publishing"
       hash: f11075c31b2e63f96a6a2bf605f09a674c6e91f2
       body: ""
